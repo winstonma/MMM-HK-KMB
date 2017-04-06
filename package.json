@@ -1,0 +1,26 @@
+{
+  "name": "MMM-HK-KMB",
+  "version": "1.0.0",
+  "description": "MagicMirror² module - station monitor for the Karlsruhe public transport system (KVV)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/winstonma/MMM-HK-Transport.git"
+  },
+  "keywords": [
+    "MagicMirror",
+    "KMB",
+    "magic mirror",
+    "smart mirror",
+    "public transport",
+    "local transit"
+  ],
+  "author": "Winston",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winstonma/MMM-HK-KMB/issues"
+  },
+  "homepage": "https://github.com/winstonma/MMM-HK-KMB#readme",
+  "dependencies": {
+    "request": "^2.74.0"
+  }
+}
