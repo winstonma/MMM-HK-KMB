@@ -4,7 +4,7 @@
   "description": "MagicMirror² module - station monitor for the Karlsruhe public transport system (KVV)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/winstonma/MMM-HK-Transport.git"
+    "url": "git+https://github.com/winstonma/MMM-HK-KMB.git"
   },
   "keywords": [
     "MagicMirror",

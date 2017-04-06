@@ -11,7 +11,7 @@ Module.register("MMM-HK-KMB", {
 
     defaults: {
         reloadInterval:  1 * 60 * 1000, // every 1 minutes
-        stopID: 'KA07-W-1000-0',
+        stopID: 'HO06-S-1250-0',
         lines: '',
         direction: '',
         labelRow: true,
