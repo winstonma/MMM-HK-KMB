@@ -45,7 +45,7 @@ module.exports = NodeHelper.create({
         var reloadInterval = config.reloadInterval || 5 * 60 * 1000;
 
         var fetcher;
-        if (typeof self.stopFetchers[url] === "undefined") {
+        if (typeof self.stopFetchers[stopID] === "undefined") {
             console.log("Create new Stop fetcher for stopID: " + stopID + " - Interval: " + reloadInterval);
             fetcher = new Fetcher_BusStop(stopID, reloadInterval);
 
@@ -68,10 +68,10 @@ module.exports = NodeHelper.create({
                 });
             });
 
-            self.stopFetchers[url] = fetcher;
+            self.stopFetchers[stopID] = fetcher;
         } else {
-            console.log("Use existing Stop fetcher for url: " + url);
-            fetcher = self.stopFetchers[url];
+            console.log("Use existing Stop fetcher for stopID: " + stopID);
+            fetcher = self.stopFetchers[stopID];
             fetcher.setReloadInterval(reloadInterval);
             fetcher.broadcastItems();
         }
