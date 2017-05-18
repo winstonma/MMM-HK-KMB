@@ -120,7 +120,7 @@ module.exports = NodeHelper.create({
             self.etaFetchers[url] = fetcher;
         } else {
             console.log("Use existing ETA fetcher for url: " + url);
-            fetcher = self.etaFetchers[stopID][url];
+            fetcher = self.etaFetchers[url];
             //fetcher.setReloadInterval(reloadInterval);
             fetcher.broadcastItems();
         }
