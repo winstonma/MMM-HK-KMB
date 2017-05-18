@@ -8,7 +8,7 @@
 var request = require("request");
 var querystring = require('querystring');
 
-var etaUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx/?"
+var etaUrl = "http://etav3.kmb.hk/?"
 
 /* Fetcher
  * Responsible for requesting an update on the set interval and broadcasting the data.
@@ -32,12 +32,12 @@ var Fetcher = function(stopInfo, reloadInterval) {
 	// Generate Url
 	var parseQueryString = {
 		action:"geteta",
-		lang:1,
+		lang:"tc",
 		route:stopInfo.Route,
 		bound:stopInfo.Bound,
-		servicetype:stopInfo.ServiceType,
-		bsiCode:stopInfo.BSICode,
-		seq:stopInfo.Seq
+		//serviceType:stopInfo.ServiceType,
+		stop:stopInfo.BSICode,
+		stop_seq:stopInfo.Seq
 	};
 	url = etaUrl + querystring.stringify(parseQueryString);
 
@@ -55,7 +55,7 @@ var Fetcher = function(stopInfo, reloadInterval) {
 		request(url, (error, response, body) => {
 			if (response.statusCode === 200) {
 				responseObj = JSON.parse(body);
-				if (!responseObj || !responseObj.result) {
+				if (!responseObj || responseObj.responsecode!=0) {
 					console.log("Error obtaining ETA connections " + response.statusCode);
 					fetchFailedCallback(self, error);
 					scheduleTimer();

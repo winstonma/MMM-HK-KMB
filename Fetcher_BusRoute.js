@@ -39,21 +39,20 @@ var Fetcher_BusStop = function(route, stopID) {
 		};
 		url = routeBoundCheckUrl + querystring.stringify(parseQueryString);
 
-		request(url, (error, response, body) => {
-			if (response.statusCode === 200) {
-				responseObj = JSON.parse(body);
-				if (!responseObj || !responseObj.result) {
-					console.log("Error obtaining BusRoute connections " + response.statusCode);
-					fetchFailedCallback(self, error);
-				}
-				for (f in responseObj.data) {
-					routeObj = responseObj.data[f];
-					fetchBusRouteInfo(routeObj);
-				}
-            } else {
-                console.log("Error getting BusRoute connections " + response.statusCode);
-                fetchFailedCallback(self, error);
-            }
+		request.post(url, (error, response, body) => {
+			if (error) {
+				console.log("Error obtaining BusRoute connections: " + error);
+				fetchFailedCallback(self, error);
+			}
+			responseObj = JSON.parse(body);
+			if (!responseObj || !responseObj.result) {
+				console.log("BusRoute response error: " + response.statusCode);
+				fetchFailedCallback(self, error);
+			}
+			for (f in responseObj.data) {
+				routeObj = responseObj.data[f];
+				fetchBusRouteInfo(routeObj);
+			}
         });
 
 	};
@@ -76,7 +75,7 @@ var Fetcher_BusStop = function(route, stopID) {
 		};
 		url = routeBoundCheckUrl + querystring.stringify(parseQueryString);
 
-		request(url, (error, response, body) => {
+		request.post(url, (error, response, body) => {
 			if (response.statusCode === 200) {
 				responseObj = JSON.parse(body);
 				if (!responseObj || !responseObj.result) {

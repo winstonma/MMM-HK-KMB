@@ -7,6 +7,7 @@
 
 var request = require("request");
 var querystring = require('querystring');
+var schedule = require('node-schedule');
 
 var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
@@ -23,8 +24,17 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 		reloadInterval = 1000;
 	}
 
-	var reloadTimer = null;
 	var items = [];
+
+	// Create a schdule to fetch
+	var rule = new schedule.RecurrenceRule();
+	//rule.hour = 5;  // 5am
+	//rule.minute = 0;
+	rule.second = 0;
+	var j = schedule.scheduleJob(rule, function(){
+		console.log('Fetching bus stop');
+		fetchBusStop();
+	});
 
 	var fetchFailedCallback = function() {};
 	var itemsReceivedCallback = function() {};
@@ -41,41 +51,25 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 			bsiCode:stopID
 		};
 		url = baseUrl + querystring.stringify(parseQueryString);
-		clearTimeout(reloadTimer);
 		reloadTimer = null;
 		items = [];
 
-		request(url, (error, response, body) => {
-			if (response.statusCode === 200) {
-				responseObj = JSON.parse(body);
-				if (!responseObj || !responseObj.result) {
-					console.log("Error obtaining ETA connections " + response.statusCode);
-					fetchFailedCallback(self, error);
-					scheduleTimer();
-				}
+		request.post(url, (error, response, body) => {
+			if (error) {
+				console.log("Error obtaining BusStop connections: " + error);
+				fetchFailedCallback(self, error);
+			}
+			responseObj = JSON.parse(body);
+			if (!responseObj || !responseObj.result) {
+				console.log("Error obtaining BusStop connections " + response.statusCode);
+				fetchFailedCallback(self, error);
+			} else {
 				responseObj.url = url;
 				items.push(responseObj);
 				self.broadcastItems();
-                scheduleTimer();
-            } else {
-                console.log("Error getting ETA connections " + response.statusCode);
-                fetchFailedCallback(self, error);
-                scheduleTimer();
-            }
+			}
         });
 
-	};
-
-	/* scheduleTimer()
-	 * Schedule the timer for the next update.
-	 */
-
-	var scheduleTimer = function() {
-		//console.log('Schedule update timer.');
-		clearTimeout(reloadTimer);
-		reloadTimer = setTimeout(function() {
-			fetchBusStop();
-		}, reloadInterval);
 	};
 
 	/* public methods */

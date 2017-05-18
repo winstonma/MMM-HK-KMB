@@ -18,7 +18,7 @@ module.exports = NodeHelper.create({
         console.log("Starting node helper for: " + this.name);
         this.stopFetchers = [];
         // Fetchers for all ETAs
-        this.fetchers = [];
+        this.etaFetchers = {};
     },
 	
     socketNotificationReceived: function(notification, payload) {
@@ -89,8 +89,10 @@ module.exports = NodeHelper.create({
     createFetcher: function(stopInfo) { 
         var self = this;
 
-        //var reloadInterval = config.reloadInterval || 5 * 60 * 1000;
-        var reloadInterval = 5 * 60 * 1000;
+        //var reloadInterval = config.reloadInterval || 60 * 1000;
+        var reloadInterval = 60 * 1000;
+
+        var stopID = stopInfo.BSICode;
 
         var fetcher = new Fetcher(stopInfo, reloadInterval);
         var url = fetcher.url();
@@ -100,7 +102,8 @@ module.exports = NodeHelper.create({
             return;
         }
 
-        if (typeof self.fetchers[url] === "undefined") {
+        if (typeof self.etaFetchers[url] === "undefined") {
+        //if (typeof self.etaFetchers[stopID][url] === "undefined") {
             console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
             fetcher.onReceive(function(fetcher) {
                 self.broadcastETAs();
@@ -113,10 +116,12 @@ module.exports = NodeHelper.create({
                 });
             });
 
-            self.fetchers[url] = fetcher;
+            //self.etaFetchers[stopID][url] = fetcher;
+            self.etaFetchers[url] = fetcher;
         } else {
             console.log("Use existing ETA fetcher for url: " + url);
-            fetcher = self.fetchers[url];
+            fetcher = self.etaFetchers[stopID][url];
+            //fetcher.setReloadInterval(reloadInterval);
             fetcher.broadcastItems();
         }
 
@@ -158,10 +163,10 @@ module.exports = NodeHelper.create({
      */
     broadcastETAs: function() {
         var etas = [];
-        for (var f in this.fetchers) {
-            if (this.fetchers[f].items() == null)
+        for (var f in this.etaFetchers) {
+            if (this.etaFetchers[f].items() == null)
                 continue;
-            etas.push(this.fetchers[f].items());
+            etas.push(this.etaFetchers[f].items());
         }
         this.sendSocketNotification("ETA_ITEMS", etas);
     },
