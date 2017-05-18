@@ -28,8 +28,8 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 
 	// Create a schdule to fetch
 	var rule = new schedule.RecurrenceRule();
-	//rule.hour = 5;  // 5am
-	//rule.minute = 0;
+	rule.hour = 5;  // 5am
+	rule.minute = 0;
 	rule.second = 0;
 	var j = schedule.scheduleJob(rule, function(){
 		console.log('Fetching bus stop');

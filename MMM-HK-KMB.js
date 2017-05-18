@@ -64,9 +64,13 @@ Module.register("MMM-HK-KMB", {
         if (notification === "ETA_ITEMS") {
             // The feed itself contains all the ETAs
             this.etaItems = payload.sort(function (a, b) {
-                if (a.stopInfo.BSICode != b.stopInfo.BSICode)
-                    return (a.stopInfo.BSICode - b.stopInfo.BSICode);
-                return (a.stopInfo.Route - b.stopInfo.Route);
+                if (a.stopInfo.BSICode > b.stopInfo.BSICode)
+                    return -1;
+                if (a.stopInfo.BSICode < b.stopInfo.BSICode)
+                    return 1;
+                if (a.stopInfo.Route < b.stopInfo.Route)
+                    return -1;
+                return 1;
                 });
             this.updateDom();
         }
@@ -122,7 +126,7 @@ Module.register("MMM-HK-KMB", {
         }
 
         var header = document.createElement("header");
-        header.innerHTML = (this.etaItems) ? this.etaItems[0].stopInfo.CName : this.config.stopName;
+        header.innerHTML = (this.etaItems.length>0) ? this.etaItems[0].stopInfo.CName : this.config.stopName;
         wrapper.appendChild(header);
 
         // Start creating connections table

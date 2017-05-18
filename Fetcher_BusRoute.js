@@ -76,25 +76,24 @@ var Fetcher_BusStop = function(route, stopID) {
 		url = routeBoundCheckUrl + querystring.stringify(parseQueryString);
 
 		request.post(url, (error, response, body) => {
-			if (response.statusCode === 200) {
-				responseObj = JSON.parse(body);
-				if (!responseObj || !responseObj.result) {
-					console.log("Error obtaining BusRoute connections " + response.statusCode);
-					fetchFailedCallback(self, error);
-				}
-				var match = responseObj.data.routeStops.find(function findStop(stops) {
-					return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-						stops.BSICode.split("-")[1] === stopID.split("-")[1])
-				});
-				if (typeof match !== 'undefined') {
-					match.basicInfo = responseObj.data.basicInfo;
-					items.push(match);
-					self.broadcastItems();
-				}
-            } else {
-                console.log("Error getting BusRoute connections " + response.statusCode);
-                fetchFailedCallback(self, error);
-            }
+			if (error) {
+				console.log("Error getting BusRoute connections: " + error);
+				fetchFailedCallback(self, error);
+			}
+			responseObj = JSON.parse(body);
+			if (!responseObj || !responseObj.result) {
+				console.log("Error obtaining BusRoute connections " + response.statusCode);
+				fetchFailedCallback(self, error);
+			}
+			var match = responseObj.data.routeStops.find(function findStop(stops) {
+				return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
+					stops.BSICode.split("-")[1] === stopID.split("-")[1])
+			});
+			if (typeof match !== 'undefined') {
+				match.basicInfo = responseObj.data.basicInfo;
+				items.push(match);
+				self.broadcastItems();
+			}
         });
 
 	};
