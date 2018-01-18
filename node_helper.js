@@ -23,8 +23,11 @@ module.exports = NodeHelper.create({
 	
     socketNotificationReceived: function(notification, payload) {
         // Request for information
-        if (notification === "ADD_STOP") {
-            this.getStopInfo(payload.config.stopID);
+        if (notification === "ADD_STOPS") {
+            for (var f in payload.config) {
+                var stopID = payload.config[f].stopID;
+                this.getStopInfo(stopID);
+            }
             return;
         }
     },

@@ -10,13 +10,15 @@
 Module.register("MMM-HK-KMB", {
 
     defaults: {
-        reloadInterval:  1 * 60 * 1000, // every 1 minutes
-        stopID: 'HO06-S-1250-0',
+        stops: [
+            {
+                stopID: 'HO06-S-1250-0',
+            }
+        ],
         lines: '',
         direction: '',
         labelRow: true,
-        stopName: 'Stop',
-        reload: 1 * 60 * 1000,       // every minute
+        reloadInterval:  1 * 60 * 1000, // every 1 minute
     },
 
     getTranslations: function () {
@@ -38,10 +40,10 @@ Module.register("MMM-HK-KMB", {
         // Collect the stop info (including the routes that the stop)
         this.etaItems = [];
         this.activeItem = 0;
-
-        this.sendSocketNotification("ADD_STOP", {
-                config: this.config
-            });
+        
+        this.sendSocketNotification("ADD_STOPS", {
+                    config: this.config.stops
+                    });
 
         //this.registerETAs();
     },
