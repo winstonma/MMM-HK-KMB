@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/winstonma/MMM-HK-KMB#readme",
   "dependencies": {
-    "request": "^2.74.0"
+    "request": "^2.83.0",
+    "node-schedule": "^1.3.0"
   }
 }

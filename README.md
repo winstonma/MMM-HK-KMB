@@ -25,6 +25,7 @@ A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/
 ## Dependencies
   * npm
   * [request](https://www.npmjs.com/package/request)
+  * [node-schedule] (https://www.npmjs.com/package/node-schedule)
 
 ## Installation
 1. Navigate into your MagicMirror's `modules` folder.
