@@ -48,7 +48,6 @@ Sample minimum configuration entry for your `~/MagicMirror/config/config.js`:
         position: 'top_left',
         config: {
             stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-            stopName: '海底隧道收費廣場'	
         }
     } 						// If this isn't your last module, add a comma after the bracket
     
@@ -63,7 +62,6 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
         position: 'top_left',
         config: {
             stopID: '',     // Which stop would you like to have displayed?
-            stopName: '',   // How would you want the stop name be displayed? 
             labelRow: true, // Show or hide column headers
             reload: 60000 	// How often should the information be updated? (In milliseconds)
         }
