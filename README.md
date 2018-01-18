@@ -47,7 +47,11 @@ Sample minimum configuration entry for your `~/MagicMirror/config/config.js`:
         module: 'MMM-HK-KMB',
         position: 'top_left',
         config: {
-            stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+            stops: [
+                {
+                    stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+                }
+            ]
         }
     } 						// If this isn't your last module, add a comma after the bracket
     
@@ -61,7 +65,11 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
         module: 'MMM-HK-KMB',
         position: 'top_left',
         config: {
-            stopID: '',     // Which stop would you like to have displayed?
+            stops: [
+                {
+                    stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+                }
+            ],
             labelRow: true, // Show or hide column headers
             reload: 60000 	// How often should the information be updated? (In milliseconds)
         }
