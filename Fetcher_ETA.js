@@ -10,14 +10,14 @@ var querystring = require('querystring');
 
 var etaUrl = "http://etav3.kmb.hk/?"
 
-/* Fetcher
+/* Fetcher_ETA
  * Responsible for requesting an update on the set interval and broadcasting the data.
  *
  * attribute url string - URL of the news feed.
  * attribute reloadInterval number - Reload interval in milliseconds.
  */
 
-var Fetcher = function(stopInfo, reloadInterval) {
+var Fetcher_ETA = function(stopInfo, reloadInterval) {
 	var self = this;
 	if (reloadInterval < 1000) {
 		reloadInterval = 1000;
@@ -139,4 +139,4 @@ var Fetcher = function(stopInfo, reloadInterval) {
 	};
 };
 
-module.exports = Fetcher;
+module.exports = Fetcher_ETA;
