@@ -8,7 +8,7 @@
 const request = require('request');
 const NodeHelper = require("node_helper");
 var validUrl = require("valid-url");
-var Fetcher = require("./Fetcher.js");
+var Fetcher_ETA = require("./Fetcher_ETA.js");
 var Fetcher_BusStop = require("./Fetcher_BusStop.js");
 var Fetcher_BusRoute = require("./Fetcher_BusRoute.js");
 
@@ -20,7 +20,7 @@ module.exports = NodeHelper.create({
         // Fetchers for all ETAs
         this.etaFetchers = {};
     },
-	
+
     socketNotificationReceived: function(notification, payload) {
         // Request for information
         if (notification === "ADD_STOPS") {
@@ -82,14 +82,14 @@ module.exports = NodeHelper.create({
         fetcher.startFetch();
     },
 
-    /* createFetcher(url, reloadInterval)
+    /* createETAFetcher(url, reloadInterval)
      * Creates a fetcher for a new url if it doesn't exist yet.
      * Otherwise it reoses the existing one.
      *
      * attribute url string - URL of the news feed.
      * attribute reloadInterval number - Reload interval in milliseconds.
      */
-    createFetcher: function(stopInfo) { 
+    createETAFetcher: function(stopInfo) { 
         var self = this;
 
         //var reloadInterval = config.reloadInterval || 60 * 1000;
@@ -97,7 +97,7 @@ module.exports = NodeHelper.create({
 
         var stopID = stopInfo.BSICode;
 
-        var fetcher = new Fetcher(stopInfo, reloadInterval);
+        var fetcher = new Fetcher_ETA(stopInfo, reloadInterval);
         var url = fetcher.url();
 
         if (!validUrl.isUri(url)) {
@@ -146,7 +146,7 @@ module.exports = NodeHelper.create({
 
         fetcher.onReceive(function(fetcher) {
             //console.log("createRouteFetcher: " + fetcher.items()[0]);
-            self.createFetcher(fetcher.items()[0]);
+            self.createETAFetcher(fetcher.items()[0]);
         });
 
         fetcher.onError(function(fetcher, error) {
