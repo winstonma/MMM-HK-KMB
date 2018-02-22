@@ -11,6 +11,7 @@ var Fetcher_ETA = require("./Fetcher_ETA.js");
 var Fetcher_BusStop = require("./Fetcher_BusStop.js");
 var Fetcher_BusRoute = require("./Fetcher_BusRoute.js");
 module.exports = NodeHelper.create({
+
     start: function() {
         console.log("Starting node helper for: " + this.name);
         // Fetchers for all stops
@@ -18,20 +19,22 @@ module.exports = NodeHelper.create({
         // Fetchers for all ETAs
         this.etaFetchers = {};
         // Stores the lookup of Stop ID and Stop Name
-        this.stopName = new Map();
+        this.stopName = [];
     },
+
     socketNotificationReceived: function(notification, payload) {
         // Request for information
         if (notification === "ADD_STOPS") {
             for (var f in payload.config) {
                 var stopID = payload.config[f].stopID;
                 // Create a new entry with no stop name
-                this.stopName.set(stopID, '');
+                this.stopName[stopID] = '';
                 this.getStopInfo(stopID);
             }
             return;
         }
     },
+
     getData: function(options, stopID) {
 		request(options, (error, response, body) => {
 	        if (response.statusCode === 200) {
@@ -41,6 +44,7 @@ module.exports = NodeHelper.create({
             }
         });
     },
+
     /*
      * Obtain the route that pass through this bus stop
      * @param {stopID} the stop ID of the bus stop
@@ -78,13 +82,13 @@ module.exports = NodeHelper.create({
         }
         fetcher.startFetch();
     },
+
     /* Creates a fetcher for collecting ETA info
      *
      * @param {stopInfo} the stop info (an object)
      */
-    createETAFetcher: function(stopInfo) { 
+    createETAFetcher: function(stopInfo) {
         var self = this;
-        //var reloadInterval = config.reloadInterval || 60 * 1000;
         var reloadInterval = 60 * 1000;
         var stopID = stopInfo.BSICode;
         var fetcher = new Fetcher_ETA(stopInfo, reloadInterval);
@@ -94,7 +98,6 @@ module.exports = NodeHelper.create({
             return;
         }
         if (typeof self.etaFetchers[url] === "undefined") {
-        //if (typeof self.etaFetchers[stopID][url] === "undefined") {
             console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
             fetcher.onReceive(function(fetcher) {
                 self.broadcastETAs();
@@ -105,16 +108,15 @@ module.exports = NodeHelper.create({
                     error: error
                 });
             });
-            //self.etaFetchers[stopID][url] = fetcher;
             self.etaFetchers[url] = fetcher;
         } else {
             console.log("Use existing ETA fetcher for url: " + url);
             fetcher = self.etaFetchers[url];
-            //fetcher.setReloadInterval(reloadInterval);
             fetcher.broadcastItems();
         }
         fetcher.startFetch();
     },
+
     /* createRouteFetcher(route, stopID)
      * Creates a fetcher for a new url if it doesn't exist yet.
      *
@@ -138,11 +140,11 @@ module.exports = NodeHelper.create({
                     fetcher.items().splice(i, 1);
                     continue;
                 }
-                if (self.stopName.get(stopID) === '') {
+                if (self.stopName[stopID] === '') {
                     let match = fetcher.items()[i].routeStops.filter(stops => stops.BSICode === stopID);
                     if (match.length == 1) {
                         // Find the exact match, store the stop name
-                        self.stopName.set(stopID, match[0].CName)
+                        self.stopName[stopID] = match[0].CName;
                     }
                 }
             }
@@ -152,10 +154,11 @@ module.exports = NodeHelper.create({
                 let match = fetcher.items()[i].routeStops.filter(stops =>
                         stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
                             stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
-                            stops.CLocation === self.stopName.get(stopID)
+                            stops.CLocation === self.stopName[stopID]
                     );
                 if (match.length == 1) {
                     // Find the desired stop, obtain the ETA
+                    match[0].basicInfo = fetcher.items()[i].basicInfo;
                     self.createETAFetcher(match[0]);
                 }
             }
@@ -168,6 +171,7 @@ module.exports = NodeHelper.create({
         });
         fetcher.startFetch();
     },
+
     /* broadcastETAs()
      * Creates an object with all feed items of the different registered ETAs,
      * and broadcasts these using sendSocketNotification.
