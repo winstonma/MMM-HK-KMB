@@ -28,7 +28,9 @@ var Fetcher_BusStop = function(route, stopID) {
 	/* private methods */
 
 	/* fetchBusRoute()
-	 * To find out how many different bound and service type does it owns
+	 * To find out how many different bound and service type does it contain
+     * Example: http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?action=getroutebound&route=1
+     * 
 	 */
 	var fetchBusRoute = function() {
 		items = [];
@@ -58,10 +60,11 @@ var Fetcher_BusStop = function(route, stopID) {
 	};
 
 	/* fetchBusRouteInfo()
-	 * To find out how many stops
+	 * To obtain the list of bus stops
+     * Example: http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?action=getstops&route=1&bound=1&serviceType=1
 	 */
 	var fetchBusRouteInfo = function(routeObj) {
-		// This assumption may not be valid
+		// Assumption: Only the main service type is served
 		if (routeObj.SERVICE_TYPE != 1) {
 			return;
 		}
@@ -79,24 +82,33 @@ var Fetcher_BusStop = function(route, stopID) {
 			if (error) {
 				console.log("Error getting BusRoute connections: " + error);
 				fetchFailedCallback(self, error);
-			}
-			responseObj = JSON.parse(body);
-			if (!responseObj || !responseObj.result) {
-				console.log("Error obtaining BusRoute connections " + response.statusCode);
-				fetchFailedCallback(self, error);
-			}
-			var match = responseObj.data.routeStops.find(function findStop(stops) {
-				return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-					stops.BSICode.split("-")[1] === stopID.split("-")[1])
-			});
-			if (typeof match !== 'undefined') {
-				match.basicInfo = responseObj.data.basicInfo;
-				items.push(match);
-				self.broadcastItems();
-			}
+                scheduleTimer();
+			} else {
+                responseObj = JSON.parse(body);
+                if (!responseObj || !responseObj.result) {
+                    console.log("Error obtaining BusRoute connections " + response.statusCode);
+                    fetchFailedCallback(self, error);
+                    scheduleTimer();
+                } else {
+                    // Return all the values, the filtering process will be done on the upper level
+                    items.push(responseObj.data);
+                    self.broadcastItems();
+                }
+            }
         });
-
 	};
+    
+    /* scheduleTimer()
+	 * Schedule the timer for the next update.
+	 */
+
+	var scheduleTimer = function() {
+		//console.log('Schedule update timer.');
+		clearTimeout(reloadTimer);
+		reloadTimer = setTimeout(function() {
+			fetchBusRouteInfo();
+		}, reloadInterval);
+    };
 
 	/* public methods */
 
