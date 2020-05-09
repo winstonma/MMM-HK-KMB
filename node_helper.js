@@ -7,7 +7,7 @@
 const request = require('request');
 const NodeHelper = require("node_helper");
 var validUrl = require("valid-url");
-var Fetcher_ETA = require("./Fetcher_ETA.js");
+var ETAFetcher = require("./etafetcher.js");
 var BusStopFetcher = require("./busstopfetcher.js");
 var BusRouteFetcher = require("./busroutefetcher.js");
 module.exports = NodeHelper.create({
@@ -88,7 +88,7 @@ module.exports = NodeHelper.create({
         var self = this;
         var reloadInterval = 60 * 1000;
         var stopID = stopInfo.BSICode;
-        var fetcher = new Fetcher_ETA(stopInfo, reloadInterval);
+        var fetcher = new ETAFetcher(stopInfo, reloadInterval);
         var url = fetcher.url();
         if (!validUrl.isUri(url)) {
             self.sendSocketNotification("INCORRECT_URL", url);
@@ -123,7 +123,6 @@ module.exports = NodeHelper.create({
     createRouteFetcher: function (route, stopID) {
         var self = this;
         var fetcher;
-        console.log("Fetching " + route + " stop " + stopID);
         fetcher = new BusRouteFetcher(route, stopID);
         fetcher.onReceive(function (fetcher) {
             // Keep relevant bounds and find the stop name
