@@ -8,11 +8,11 @@ const request = require('request');
 const NodeHelper = require("node_helper");
 var validUrl = require("valid-url");
 var Fetcher_ETA = require("./Fetcher_ETA.js");
-var Fetcher_BusStop = require("./Fetcher_BusStop.js");
-var Fetcher_BusRoute = require("./Fetcher_BusRoute.js");
+var BusStopFetcher = require("./busstopfetcher.js");
+var BusRouteFetcher = require("./busroutefetcher.js");
 module.exports = NodeHelper.create({
 
-    start: function() {
+    start: function () {
         console.log("Starting node helper for: " + this.name);
         // Fetchers for all stops
         this.stopFetchers = [];
@@ -22,7 +22,7 @@ module.exports = NodeHelper.create({
         this.stopName = [];
     },
 
-    socketNotificationReceived: function(notification, payload) {
+    socketNotificationReceived: function (notification, payload) {
         // Request for information
         if (notification === "ADD_STOPS") {
             for (var f in payload.config) {
@@ -35,9 +35,9 @@ module.exports = NodeHelper.create({
         }
     },
 
-    getData: function(options, stopID) {
-		request(options, (error, response, body) => {
-	        if (response.statusCode === 200) {
+    getData: function (options, stopID) {
+        request(options, (error, response, body) => {
+            if (response.statusCode === 200) {
                 this.sendSocketNotification("KMBETA" + stopID, JSON.parse(body));
             } else {
                 console.log("Error getting tram connections " + response.statusCode);
@@ -49,25 +49,22 @@ module.exports = NodeHelper.create({
      * Obtain the route that pass through this bus stop
      * @param {stopID} the stop ID of the bus stop
      */
-    getStopInfo: function(stopID) {
+    getStopInfo: function (stopID) {
         var self = this;
         var reloadInterval = config.reloadInterval || 5 * 60 * 1000;
         var fetcher;
         if (typeof self.stopFetchers[stopID] === "undefined") {
             console.log("Create new stop fetcher for stopID: " + stopID + " - Interval: " + reloadInterval);
-            fetcher = new Fetcher_BusStop(stopID, reloadInterval);
-            fetcher.onReceive(function(fetcher) {
-                var items = fetcher.items();
-                var stopID = fetcher.stopID();
+            fetcher = new BusStopFetcher(stopID, reloadInterval);
+            fetcher.onReceive(function (fetcher) {
+                const items = fetcher.items();
+                const stopID = fetcher.stopID();
                 for (var f in items) {
                     var routes = items[f].data;
-                    for (var f in routes) {
-                        var route = routes[f];
-                        self.createRouteFetcher(route, stopID);
-                    }
+                    routes.map((route) => self.createRouteFetcher(route.trim(), stopID));
                 }
             });
-            fetcher.onError(function(fetcher, error) {
+            fetcher.onError(function (fetcher, error) {
                 self.sendSocketNotification("FETCH_ERROR", {
                     url: fetcher.url(),
                     error: error
@@ -87,7 +84,7 @@ module.exports = NodeHelper.create({
      *
      * @param {stopInfo} the stop info (an object)
      */
-    createETAFetcher: function(stopInfo) {
+    createETAFetcher: function (stopInfo) {
         var self = this;
         var reloadInterval = 60 * 1000;
         var stopID = stopInfo.BSICode;
@@ -99,10 +96,10 @@ module.exports = NodeHelper.create({
         }
         if (typeof self.etaFetchers[url] === "undefined") {
             console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
-            fetcher.onReceive(function(fetcher) {
+            fetcher.onReceive(function (fetcher) {
                 self.broadcastETAs();
             });
-            fetcher.onError(function(fetcher, error) {
+            fetcher.onError(function (fetcher, error) {
                 self.sendSocketNotification("FETCH_ERROR", {
                     url: fetcher.url(),
                     error: error
@@ -123,47 +120,35 @@ module.exports = NodeHelper.create({
      * attribute url string - URL of the news feed.
      * attribute busStop number - BusStopID
      */
-    createRouteFetcher: function(route, stopID) {
+    createRouteFetcher: function (route, stopID) {
         var self = this;
         var fetcher;
-        fetcher = new Fetcher_BusRoute(route, stopID);
-        fetcher.onReceive(function(fetcher) {
-            // Cleanup any irrelevant bounds and find the stop name
-            for(let i=fetcher.items().length-1; i>=0; i--) {
-                // If the route doesn't match any of the stops, then it will be dumped
-                let match = fetcher.items()[i].routeStops.filter(stops =>
-                        stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-                            stops.BSICode.split("-")[1] === stopID.split("-")[1]
-                    );
-                if (match.length == 0) {
-                    // Remove the irrelevant entries
-                    fetcher.items().splice(i, 1);
-                    continue;
-                }
+        console.log("Fetching " + route + " stop " + stopID);
+        fetcher = new BusRouteFetcher(route, stopID);
+        fetcher.onReceive(function (fetcher) {
+            // Keep relevant bounds and find the stop name
+            fetcher.items().filter((routeInfo) => {
+                // Check if the stop is in the routeinfo
+                const match = routeInfo.routeStops.filter(stops =>
+                    stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
+                    stops.BSICode.split("-")[1] === stopID.split("-")[1]
+                );
+                // Find out the stop name
                 if (self.stopName[stopID] === '') {
-                    let match = fetcher.items()[i].routeStops.filter(stops => stops.BSICode === stopID);
+                    const match = routeInfo.routeStops.filter(stops => stops.BSICode === stopID);
                     if (match.length == 1) {
                         // Find the exact match, store the stop name
                         self.stopName[stopID] = match[0].CName;
                     }
                 }
-            }
-            // Next, we need to find if there are any match
-            for(let i=fetcher.items().length-1; i>=0; i--) {
-                // If the route doesn't match any of the stops, then it will be dumped
-                let match = fetcher.items()[i].routeStops.filter(stops =>
-                        stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-                            stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
-                            stops.CLocation === self.stopName[stopID]
-                    );
                 if (match.length == 1) {
                     // Find the desired stop, obtain the ETA
-                    match[0].basicInfo = fetcher.items()[i].basicInfo;
+                    match[0].basicInfo = routeInfo.basicInfo;
                     self.createETAFetcher(match[0]);
                 }
-            }
+            });
         });
-        fetcher.onError(function(fetcher, error) {
+        fetcher.onError(function (fetcher, error) {
             self.sendSocketNotification("FETCH_ERROR", {
                 url: fetcher.url(),
                 error: error
@@ -176,7 +161,7 @@ module.exports = NodeHelper.create({
      * Creates an object with all feed items of the different registered ETAs,
      * and broadcasts these using sendSocketNotification.
      */
-    broadcastETAs: function() {
+    broadcastETAs: function () {
         var etas = [];
         for (var f in this.etaFetchers) {
             if (this.etaFetchers[f].items() == null)

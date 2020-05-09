@@ -11,14 +11,7 @@ var schedule = require('node-schedule');
 
 var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
-/* Fetcher
- * Responsible for requesting an update on the set interval and broadcasting the data.
- *
- * attribute url string - URL of the news feed.
- * attribute reloadInterval number - Reload interval in milliseconds.
- */
-
-var Fetcher_BusStop = function(stopID, reloadInterval) {
+var BusStopFetcher = function (stopID, reloadInterval) {
 	var self = this;
 	if (reloadInterval < 1000) {
 		reloadInterval = 1000;
@@ -31,26 +24,27 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 	rule.hour = 5;  // 5am
 	rule.minute = 0;
 	rule.second = 0;
-	var j = schedule.scheduleJob(rule, function(){
+	var j = schedule.scheduleJob(rule, function () {
 		console.log('Fetching bus stop');
 		fetchBusStop();
 	});
 
-	var fetchFailedCallback = function() {};
-	var itemsReceivedCallback = function() {};
+	var fetchFailedCallback = function () { };
+	var itemsReceivedCallback = function () { };
 
 	/* private methods */
 
 	/* fetchBusStop()
-	 * Request the ETA.
+	 * Find out what route passes this bus stop
 	 */
 
-	var fetchBusStop = function() {
-		var parseQueryString = {
-			action:"getRoutesInStop",
-			bsiCode:stopID
+	const fetchBusStop = function () {
+		const parseQueryString = {
+			action: "getRoutesInStop",
+			bsiCode: stopID
 		};
 		url = baseUrl + querystring.stringify(parseQueryString);
+		console.log("url:" + url);
 		reloadTimer = null;
 		items = [];
 
@@ -66,9 +60,10 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 			} else {
 				responseObj.url = url;
 				items.push(responseObj);
+				console.log("items:" + JSON.stringify(items))
 				self.broadcastItems();
 			}
-        });
+		});
 
 	};
 
@@ -79,7 +74,7 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 	 *
 	 * attribute interval number - Interval for the update in milliseconds.
 	 */
-	this.setReloadInterval = function(interval) {
+	this.setReloadInterval = function (interval) {
 		if (interval > 1000 && interval < reloadInterval) {
 			reloadInterval = interval;
 		}
@@ -88,41 +83,41 @@ var Fetcher_BusStop = function(stopID, reloadInterval) {
 	/* startFetch()
 	 * Initiate fetchBusStop();
 	 */
-	this.startFetch = function() {
+	this.startFetch = function () {
 		fetchBusStop();
 	};
 
 	/* broadcastItems()
 	 * Broadcast the existing items.
 	 */
-	this.broadcastItems = function() {
+	this.broadcastItems = function () {
 		if (items.length <= 0) {
 			//console.log('No items to broadcast yet.');
 			return;
 		}
-		//console.log('Broadcasting ' + items.length + ' items.');
+		console.log('Broadcasting ' + items.length + ' items.');
 		itemsReceivedCallback(self);
 	};
 
-	this.onReceive = function(callback) {
+	this.onReceive = function (callback) {
 		itemsReceivedCallback = callback;
 	};
 
-	this.onError = function(callback) {
+	this.onError = function (callback) {
 		fetchFailedCallback = callback;
 	};
 
-	this.url = function() {
+	this.url = function () {
 		return url;
 	};
 
-	this.stopID = function() {
+	this.stopID = function () {
 		return stopID;
 	};
 
-	this.items = function() {
+	this.items = function () {
 		return items;
 	};
 };
 
-module.exports = Fetcher_BusStop;
+module.exports = BusStopFetcher;

@@ -8,16 +8,9 @@
 var request = require("request");
 var querystring = require('querystring');
 
-var routeBoundCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+const routeBoundCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
-/* Fetcher
- * Responsible for requesting an update on the set interval and broadcasting the data.
- *
- * attribute url string - URL of the news feed.
- * attribute reloadInterval number - Reload interval in milliseconds.
- */
-
-var Fetcher_BusStop = function(route, stopID) {
+var BusRouteFetcher = function(route, stopID) {
 	var self = this;
 
 	var items = [];
@@ -148,4 +141,4 @@ var Fetcher_BusStop = function(route, stopID) {
 	};
 };
 
-module.exports = Fetcher_BusStop;
+module.exports = BusRouteFetcher;
