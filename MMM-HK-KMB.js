@@ -23,9 +23,9 @@ Module.register("MMM-HK-KMB", {
 
     getTranslations: function () {
         return {
-            de: "translations/de.json",
-            en: "translations/en.json",
-            zh: "translations/zh.json"
+            "de": "translations/de.json",
+            "en": "translations/en.json",
+            "zh": "translations/zh.json"
         };
     },
 
