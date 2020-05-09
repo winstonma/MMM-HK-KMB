@@ -8,7 +8,7 @@
 var request = require("request");
 var querystring = require('querystring');
 
-var etaUrl = "http://etav3.kmb.hk/?"
+const etaUrl = "http://etav3.kmb.hk/?"
 
 /* ETAFetcher
 
@@ -18,37 +18,33 @@ var etaUrl = "http://etav3.kmb.hk/?"
  * attribute reloadInterval number - Reload interval in milliseconds.
  */
 
-var ETAFetcher = function(stopInfo, reloadInterval) {
+var ETAFetcher = function (stopInfo, reloadInterval) {
 	var self = this;
-	if (reloadInterval < 1000) {
-		reloadInterval = 1000;
-	}
+	reloadInterval = (reloadInterval < 1000) ? 1000 : reloadInterval;
 
 	var reloadTimer = null;
 	var items = [];
 
-	var fetchFailedCallback = function() {};
-	var itemsReceivedCallback = function() {};
+	var fetchFailedCallback = function () { };
+	var itemsReceivedCallback = function () { };
 
 	// Generate Url
-	var parseQueryString = {
-		action:"geteta",
-		lang:"tc",
-		route:stopInfo.Route,
-		bound:stopInfo.Bound,
-		//serviceType:stopInfo.ServiceType,
-		stop:stopInfo.BSICode,
-		stop_seq:stopInfo.Seq
+	const parseQueryString = {
+		action: "geteta",
+		lang: "tc",
+		route: stopInfo.Route,
+		bound: stopInfo.Bound,
+		stop: stopInfo.BSICode,
+		stop_seq: stopInfo.Seq
 	};
-	url = etaUrl + querystring.stringify(parseQueryString);
+	const url = etaUrl + querystring.stringify(parseQueryString);
 
 	/* private methods */
 
 	/* fetchETA()
 	 * Request the ETA.
 	 */
-
-	var fetchETA = function() {
+	var fetchETA = function () {
 		clearTimeout(reloadTimer);
 		reloadTimer = null;
 		items = [];
@@ -56,7 +52,7 @@ var ETAFetcher = function(stopInfo, reloadInterval) {
 		request(url, (error, response, body) => {
 			if (response.statusCode === 200) {
 				responseObj = JSON.parse(body);
-				if (!responseObj || responseObj.responsecode!=0) {
+				if (!responseObj || responseObj.responsecode != 0) {
 					console.log("Error obtaining ETA connections " + response.statusCode);
 					fetchFailedCallback(self, error);
 					scheduleTimer();
@@ -64,25 +60,24 @@ var ETAFetcher = function(stopInfo, reloadInterval) {
 				//responseObj.url = url;
 				responseObj.stopInfo = stopInfo;
 				items.push(responseObj);
-	        	self.broadcastItems();
-                scheduleTimer();
-            } else {
-                console.log("Error getting ETA connections " + response.statusCode);
-                fetchFailedCallback(self, error);
-                scheduleTimer();
-            }
-        });
+				self.broadcastItems();
+				scheduleTimer();
+			} else {
+				console.log("Error getting ETA connections " + response.statusCode);
+				fetchFailedCallback(self, error);
+				scheduleTimer();
+			}
+		});
 
 	};
 
 	/* scheduleTimer()
 	 * Schedule the timer for the next update.
 	 */
-
-	var scheduleTimer = function() {
+	var scheduleTimer = function () {
 		//console.log('Schedule update timer.');
 		clearTimeout(reloadTimer);
-		reloadTimer = setTimeout(function() {
+		reloadTimer = setTimeout(function () {
 			fetchETA();
 		}, reloadInterval);
 	};
@@ -94,7 +89,7 @@ var ETAFetcher = function(stopInfo, reloadInterval) {
 	 *
 	 * attribute interval number - Interval for the update in milliseconds.
 	 */
-	this.setReloadInterval = function(interval) {
+	this.setReloadInterval = function (interval) {
 		if (interval > 1000 && interval < reloadInterval) {
 			reloadInterval = interval;
 		}
@@ -103,14 +98,14 @@ var ETAFetcher = function(stopInfo, reloadInterval) {
 	/* startFetch()
 	 * Initiate fetchETA();
 	 */
-	this.startFetch = function() {
+	this.startFetch = function () {
 		fetchETA();
 	};
 
 	/* broadcastItems()
 	 * Broadcast the existing items.
 	 */
-	this.broadcastItems = function() {
+	this.broadcastItems = function () {
 		if (items.length <= 0) {
 			//console.log('No items to broadcast yet.');
 			return;
@@ -119,23 +114,23 @@ var ETAFetcher = function(stopInfo, reloadInterval) {
 		itemsReceivedCallback(self);
 	};
 
-	this.onReceive = function(callback) {
+	this.onReceive = function (callback) {
 		itemsReceivedCallback = callback;
 	};
 
-	this.onError = function(callback) {
+	this.onError = function (callback) {
 		fetchFailedCallback = callback;
 	};
 
-	this.url = function() {
+	this.url = function () {
 		return url;
 	};
 
-	this.route = function() {
+	this.route = function () {
 		return stopInfo.Route;
 	}
 
-	this.items = function() {
+	this.items = function () {
 		return items[0];
 	};
 };

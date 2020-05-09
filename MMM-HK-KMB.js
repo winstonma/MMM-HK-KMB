@@ -142,7 +142,6 @@ Module.register("MMM-HK-KMB", {
 
         for (t in this.etaItems) {
             var etaObj = this.etaItems[t];
-            console.log(etaObj.stopInfo.BSICode);
             data = this.createDataRow(etaObj);
             if (!data)
                 continue;

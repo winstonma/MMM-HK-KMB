@@ -6,10 +6,11 @@
  */
 const request = require('request');
 const NodeHelper = require("node_helper");
-var validUrl = require("valid-url");
-var ETAFetcher = require("./etafetcher.js");
-var BusStopFetcher = require("./busstopfetcher.js");
-var BusRouteFetcher = require("./busroutefetcher.js");
+const validUrl = require("valid-url");
+const ETAFetcher = require("./etafetcher.js");
+const BusStopFetcher = require("./busstopfetcher.js");
+const BusRouteFetcher = require("./busroutefetcher.js");
+
 module.exports = NodeHelper.create({
 
     start: function () {
@@ -17,7 +18,7 @@ module.exports = NodeHelper.create({
         // Fetchers for all stops
         this.stopFetchers = [];
         // Fetchers for all ETAs
-        this.etaFetchers = {};
+        this.etaFetchers = [];
         // Stores the lookup of Stop ID and Stop Name
         this.stopName = [];
     },
@@ -86,14 +87,16 @@ module.exports = NodeHelper.create({
      */
     createETAFetcher: function (stopInfo) {
         var self = this;
-        var reloadInterval = 60 * 1000;
-        var stopID = stopInfo.BSICode;
+
+        const reloadInterval = 60 * 1000;
         var fetcher = new ETAFetcher(stopInfo, reloadInterval);
-        var url = fetcher.url();
+
+        const url = fetcher.url();
         if (!validUrl.isUri(url)) {
             self.sendSocketNotification("INCORRECT_URL", url);
             return;
         }
+
         if (typeof self.etaFetchers[url] === "undefined") {
             console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
             fetcher.onReceive(function (fetcher) {
@@ -161,11 +164,11 @@ module.exports = NodeHelper.create({
      * and broadcasts these using sendSocketNotification.
      */
     broadcastETAs: function () {
-        var etas = [];
-        for (var f in this.etaFetchers) {
-            if (this.etaFetchers[f].items() == null)
-                continue;
-            etas.push(this.etaFetchers[f].items());
+        let etas = [];
+        for (const [url, fetcher] of Object.entries(this.etaFetchers)) {
+            if (fetcher.items() != null) {
+                etas.push(fetcher.items());
+            }
         }
         this.sendSocketNotification("ETA_ITEMS", etas);
     },
