@@ -7,5 +7,6 @@
   "NO-TRAMS": "沒有數據",
   "MINUTE": "分鐘",
   "MINUTES": "分鐘",
-  "EVERY": "每" 
+  "EVERY": "每",
+  "INACTIVE": "<sup>不活躍</sup>"
 }

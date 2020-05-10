@@ -7,5 +7,6 @@
   "NO-TRAMS": "No connections available",
   "MINUTE": " minute",
   "MINUTES": " minutes",
-  "EVERY": "Every "
+  "EVERY": "Every ",
+  "INACTIVE": "<sup>Inactive</sup>"
 }

@@ -7,6 +7,20 @@
  * v1.0.0
  */
 
+// String replacer
+const BUSLINELOOKUP = {
+  "新巴": "<sup>新</sup>",
+  "九巴": "<sup>九</sup>",
+  "城巴": "<sup>城</sup>",
+  "預定班次": "*"
+};
+
+// No bus indicator
+const NOBUSINDICATORLIST = [
+  "暫時沒有預定班次",
+  "此路線只於"
+]
+
 Module.register("MMM-HK-KMB", {
 
   defaults: {
@@ -15,8 +29,7 @@ Module.register("MMM-HK-KMB", {
         stopID: 'HO06-S-1250-0',
       }
     ],
-    lines: '',
-    direction: '',
+    inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
     labelRow: true,
     reloadInterval: 1 * 60 * 1000, // every 1 minute
   },
@@ -70,7 +83,7 @@ Module.register("MMM-HK-KMB", {
           return -1;
         if (a.stopInfo.BSICode < b.stopInfo.BSICode)
           return 1;
-        if (a.stopInfo.Route < b.stopInfo.Route)
+        if (a.stopInfo.Route < b.stopInfo.Route) 
           return -1;
         return 1;
       });
@@ -140,12 +153,23 @@ Module.register("MMM-HK-KMB", {
 
     table.appendChild(this.createSpacerRow());
 
+    let nonActiveRoute = [];
+
     for (t in this.etaItems) {
       var etaObj = this.etaItems[t];
-      data = this.createDataRow(etaObj);
-      if (!data)
-        continue;
-      table.appendChild(data);
+
+      if (etaObj.response.length == 1 && this.containsAny(etaObj.response[0].t, NOBUSINDICATORLIST)) {
+        nonActiveRoute.push(etaObj.stopInfo.Route);
+      } else {
+        data = this.createDataRow(etaObj);
+        if (data != null)
+          table.appendChild(data);
+      }
+    }
+
+    if (this.config.inactiveRouteCountPerRow != 0) {
+      table.appendChild(this.createSpacerRow());
+      table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
     }
 
     wrapper.appendChild(table);
@@ -186,6 +210,34 @@ Module.register("MMM-HK-KMB", {
     return spacerRow;
   },
 
+  createNonActiveRouteRow: function (nonActiveRoute) {
+    let labelRows = document.createDocumentFragment();
+
+    // Remove duplicates and sort
+    const orderedNonActiveRoute = Array.from(new Set(nonActiveRoute)).sort();
+    // Split it into multiple sizes
+    const nonActiveRouteDisplayList = this.chunkArrayInGroups(orderedNonActiveRoute, this.config.inactiveRouteCountPerRow);
+
+    nonActiveRouteDisplayList.forEach((nonActiveRouteDisplayRow, count) => {
+      let labelRow = document.createElement("tr");
+
+      var lineLabel = document.createElement("th");
+      if (count == 0) {
+        lineLabel.className = "line";
+        lineLabel.innerHTML = this.translate("INACTIVE");
+      }
+      labelRow.appendChild(lineLabel);
+
+      var destinationLabel = document.createElement("th");
+      destinationLabel.className = "destination";
+      destinationLabel.innerHTML = nonActiveRouteDisplayRow;
+      labelRow.appendChild(destinationLabel);
+
+      labelRows.appendChild(labelRow);
+    });
+
+    return labelRows;
+  },
 
   createNoTramRow: function () {
     var noTramRow = document.createElement("tr");
@@ -221,14 +273,41 @@ Module.register("MMM-HK-KMB", {
       departure.className = "departure";
       etaArray = [];
       for (r in etaInfo) {
-        var etaStr = etaInfo[r].t;
-        etaStr = etaStr.split('　')[0];
-        etaArray.push(etaStr);
+        let etaStr = etaInfo[r].t;
+        const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/ /g, '');
+        etaArray.push(eta);
       }
       departure.innerHTML = etaArray.toString();
       row.appendChild(departure);
     }
     return row;
-  }
+  },
+
+  replaceAll: function (str, mapObj) {
+    var re = new RegExp(Object.keys(mapObj).join("|"), "gi");
+
+    return str.replace(re, function (matched) {
+      return mapObj[matched.toLowerCase()];
+    });
+  },
+
+  containsAny: function (str, items) {
+    for (var i in items) {
+      var item = items[i];
+      if (str.indexOf(item) > -1) {
+        return true;
+      }
+
+    }
+    return false;
+  },
+
+  chunkArrayInGroups: function (arr, size) {
+    var myArray = [];
+    for (var i = 0; i < arr.length; i += size) {
+      myArray.push(arr.slice(i, i + size));
+    }
+    return myArray;
+  },
 
 });
