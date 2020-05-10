@@ -130,13 +130,6 @@ module.exports = NodeHelper.create({
     fetcher.onReceive(function (fetcher) {
       // Keep relevant bounds and find the stop name
       fetcher.items().filter((routeInfo) => {
-        // Check if the stop is in the routeinfo
-        const match = routeInfo.routeStops.filter(stops =>
-          stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-          stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
-          stops.BSICode.split("-")[2].slice(0, 2) === stopID.split("-")[2].slice(0, 2)
-        );
-
         // Find out the stop name
         if (self.stopName[stopID] === '') {
           const match = routeInfo.routeStops.filter(stops => stops.BSICode === stopID);
@@ -145,6 +138,18 @@ module.exports = NodeHelper.create({
             self.stopName[stopID] = match[0].CName;
           }
         }
+
+        // Finding the matching stops from the bus route
+        const match = routeInfo.routeStops.filter((stops) => {
+          if (self.stopName[stopID] === '')
+            return false;
+
+          return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
+            stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
+            stops.CName == self.stopName[stopID]
+          );
+        });
+
         if (match.length >= 1) {
           match.map((info) => {
             info.basicInfo = routeInfo.basicInfo;
