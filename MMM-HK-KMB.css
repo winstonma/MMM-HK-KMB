@@ -1,36 +1,35 @@
 .MMM-HK-KMB .table {
-    border-spacing: 0px 0px;
-    border-collapse: separate;
-    text-align: left;
-	}
+	border-spacing: 0px 0px;
+	border-collapse: separate;
+	text-align: left;
+}
 
 .MMM-HK-KMB .spacerRow {
 	padding-bottom: 5px;
-	}
+}
 
 .MMM-HK-KMB .destination {
 	font-weight: normal;
 	color: white;
-	}
-	
+}
+
 .MMM-HK-KMB .line {
-    border-spacing: 10px 0px;
-    border-collapse: separate;
-    text-align: left;
-	color:white;
+	border-spacing: 10px 0px;
+	border-collapse: separate;
+	text-align: left;
+	color: white;
 	font-weight: normal;
 	width: 50px;
-	}
-	
+}
+
 .MMM-HK-KMB .departure {
 	padding-left: 10px;
 	text-align: right;
 	font-weight: normal;
 	color: white;
-	}
-	
+}
+
 .MMM-HK-KMB .noTramRow {
 	font-weight: normal;
 	color: white;
-	}
-	
+}
