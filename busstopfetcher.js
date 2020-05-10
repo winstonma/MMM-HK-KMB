@@ -44,7 +44,6 @@ var BusStopFetcher = function (stopID, reloadInterval) {
 			bsiCode: stopID
 		};
 		url = baseUrl + querystring.stringify(parseQueryString);
-		console.log("url:" + url);
 		reloadTimer = null;
 		items = [];
 
