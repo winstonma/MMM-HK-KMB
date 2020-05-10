@@ -133,8 +133,10 @@ module.exports = NodeHelper.create({
         // Check if the stop is in the routeinfo
         const match = routeInfo.routeStops.filter(stops =>
           stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-          stops.BSICode.split("-")[1] === stopID.split("-")[1]
+          stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
+          stops.BSICode.split("-")[2].slice(0, 2) === stopID.split("-")[2].slice(0, 2)
         );
+
         // Find out the stop name
         if (self.stopName[stopID] === '') {
           const match = routeInfo.routeStops.filter(stops => stops.BSICode === stopID);
@@ -143,10 +145,17 @@ module.exports = NodeHelper.create({
             self.stopName[stopID] = match[0].CName;
           }
         }
-        if (match.length == 1) {
+        if (match.length >= 1) {
+          match.map((info) => {
+            info.basicInfo = routeInfo.basicInfo;
+            self.createETAFetcher(info);
+          });
+          /*
+          console.log(match[1])
           // Find the desired stop, obtain the ETA
           match[0].basicInfo = routeInfo.basicInfo;
           self.createETAFetcher(match[0]);
+          */
         }
       });
     });
