@@ -44,43 +44,43 @@ This module has been programmed to allow for multiple instances. Simply add more
 ## Configuration
 Sample minimum configuration entry for your `~/MagicMirror/config/config.js`:
 
-  ...
+    ...
 
-  {
-    module: 'MMM-HK-KMB',
-    position: 'top_left',
-    config: {
-      stops: [
-        {
-          stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-        }
-      ]
-    }
-  } 						// If this isn't your last module, add a comma after the bracket
+    {
+      module: 'MMM-HK-KMB',
+      position: 'top_left',
+      config: {
+        stops: [
+          {
+            stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+          }
+        ]
+      }
+    } 						// If this isn't your last module, add a comma after the bracket
   
   ...
 
 Sample configuration entry for your `~/MagicMirror/config/config.js` with optional parameters:
 
-  ...
+    ...
 
-  {
-    module: 'MMM-HK-KMB',
-    position: 'top_left',
-    config: {
-      stops: [
-        {
-          stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-        }
-      ],
-      labelRow: true, // Show or hide column headers
-      reload: 60000 	// How often should the information be updated? (In milliseconds)
-    }
-  } 						// If this isn't your last module, add a comma after the bracket
+    {
+      module: 'MMM-HK-KMB',
+      position: 'top_left',
+      config: {
+        stops: [
+          {
+            stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+          }
+        ],
+        labelRow: true, // Show or hide column headers
+        reload: 60000 	// How often should the information be updated? (In milliseconds)
+      }
+    } 						// If this isn't your last module, add a comma after the bracket
 
-  ...
+    ...
 
-## Figuring out the correct stopID
+## Find the `stopID`
 1. Open your web browser and navigate to the [USHB KMB Search Page](https://search.ushb.net/bus/KMB).
 2. Enter the KMB Bus route number that passes the stop. Then the route info would be displayed.
 3. At the top of the page, pick the desired `路線方向`
