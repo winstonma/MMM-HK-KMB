@@ -1,7 +1,7 @@
 /* Magic Mirror
- * Fetcher
+ * Module: MMM-HK-Transport
  *
- * By Michael Teeuw http://michaelteeuw.nl
+ * By Winston / https://github.com/winstonma
  * MIT Licensed.
  */
 

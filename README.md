@@ -14,7 +14,7 @@ Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</s
 
 ## Current version
 
-v1.0.0
+v1.1.0
 
 ## Languages
 As of version 1.0.0, MMM-HK-KMB features language support for `Chinese (zh)` and `English (en)` mirrors.
