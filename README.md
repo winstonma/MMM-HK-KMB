@@ -73,6 +73,7 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
             stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
           }
         ],
+        inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
         labelRow: true, // Show or hide column headers
         reload: 60000 	// How often should the information be updated? (In milliseconds)
       }
@@ -92,7 +93,6 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 | **Option** | **Default** | **Description** |
 | :---: | :---: | --- |
 | stopID | HO06-S-1250-0 | <BR>Which stop would you like to have displayed? <BR><EM> Default: HO06-S-1250-0</EM><P> |
-| stopName | Stop | <BR>How would you want the stop name be displayed? <BR><EM> Default: Stop</EM><P> |
 | labelRow<BR>`optional` | true | <BR> Show or hide column headers<BR> <EM>Possible values: true, false</EM><P> |
 | reload<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
 
