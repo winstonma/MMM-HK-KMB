@@ -150,12 +150,6 @@ module.exports = NodeHelper.create({
             info.basicInfo = routeInfo.basicInfo;
             self.createETAFetcher(info);
           });
-          /*
-          console.log(match[1])
-          // Find the desired stop, obtain the ETA
-          match[0].basicInfo = routeInfo.basicInfo;
-          self.createETAFetcher(match[0]);
-          */
         }
       });
     });
