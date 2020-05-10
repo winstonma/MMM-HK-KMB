@@ -28,10 +28,13 @@ A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/
   * [node-schedule](https://www.npmjs.com/package/node-schedule)
 
 ## Installation
-1. Navigate into your MagicMirror's `modules` folder.
-2. Execute `git clone https://github.com/winstonma/MMM-HK-KMB.git`.
-3. Execute `cd MMM-HK-KMB`.
-3. Execute `npm install`.
+To add this module, go to MagicMirror folder and run the following command
+```bash
+cd modules
+git clone https://github.com/winstonma/MMM-HK-KMB.git
+cd MMM-HK-KMB
+npm install
+```
 
 ## Module behavior
 Please note that this module auto-creates a module header which displays the name of the chosen Hong Kong local transport stop. It is therefore recommended not to add a 'header' entry to your config.js for this module.<P>
@@ -41,47 +44,49 @@ This module has been programmed to allow for multiple instances. Simply add more
 ## Configuration
 Sample minimum configuration entry for your `~/MagicMirror/config/config.js`:
 
-    ...
-    
-    {
-        module: 'MMM-HK-KMB',
-        position: 'top_left',
-        config: {
-            stops: [
-                {
-                    stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-                }
-            ]
+  ...
+
+  {
+    module: 'MMM-HK-KMB',
+    position: 'top_left',
+    config: {
+      stops: [
+        {
+          stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
         }
-    } 						// If this isn't your last module, add a comma after the bracket
-    
-    ...
+      ]
+    }
+  } 						// If this isn't your last module, add a comma after the bracket
+  
+  ...
 
 Sample configuration entry for your `~/MagicMirror/config/config.js` with optional parameters:
 
-    ...
-    
-    {
-        module: 'MMM-HK-KMB',
-        position: 'top_left',
-        config: {
-            stops: [
-                {
-                    stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-                }
-            ],
-            labelRow: true, // Show or hide column headers
-            reload: 60000 	// How often should the information be updated? (In milliseconds)
+  ...
+
+  {
+    module: 'MMM-HK-KMB',
+    position: 'top_left',
+    config: {
+      stops: [
+        {
+          stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
         }
-    } 						// If this isn't your last module, add a comma after the bracket
-    
-    ...
+      ],
+      labelRow: true, // Show or hide column headers
+      reload: 60000 	// How often should the information be updated? (In milliseconds)
+    }
+  } 						// If this isn't your last module, add a comma after the bracket
+
+  ...
 
 ## Figuring out the correct stopID
-1. Open your web browser and navigate to the [KMB Mobile Page](http://m.kmb.hk/tc/).
-2. Use the top search field to find the Line that the stop will stopped.
-3. Once you can see the stop in your browser, click the Map.
-4. When a new page is being displayed, check the link (e.g. http://www.kmb.hk/chi/map.php?file=HO06-S-1250-0). Note the last portion of the link (e.g. HO06-S-1250-0)is the `StopID` you are looking for.
+1. Open your web browser and navigate to the [USHB KMB Search Page](https://search.ushb.net/bus/KMB).
+2. Enter the KMB Bus route number that passes the stop. Then the route info would be displayed.
+3. At the top of the page, pick the desired `路線方向`
+4. Go to the bus stop list and click on your bus stop
+5. At the map, click on `車站資料`. A new page would be displayed.
+6. When a new page is being displayed, check the link (e.g. https://search.ushb.net/bus/stop/TS26-T-1000-0). Note the last portion of the link (e.g. HO06-S-1250-0)is the `StopID` you are looking for.
 
 ## Config Options
 | **Option** | **Default** | **Description** |
