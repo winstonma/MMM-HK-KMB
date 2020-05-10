@@ -60,7 +60,6 @@ var BusStopFetcher = function (stopID, reloadInterval) {
 			} else {
 				responseObj.url = url;
 				items.push(responseObj);
-				console.log("items:" + JSON.stringify(items))
 				self.broadcastItems();
 			}
 		});
