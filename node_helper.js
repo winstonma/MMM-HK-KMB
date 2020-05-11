@@ -11,7 +11,6 @@ const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
 const BusRouteFetcher = require("./busroutefetcher.js");
 
-const querystring = require('querystring');
 const got = require('got');
 
 module.exports = NodeHelper.create({
@@ -34,10 +33,10 @@ module.exports = NodeHelper.create({
     const parseQueryString = {
       action: "getallstops"
     };
-    const url = routeStopCheckUrl + querystring.stringify(parseQueryString);
 
     try {
-      const { body } = await got.post(url, {
+      const { body } = await got.post(routeStopCheckUrl, {
+        searchParams: parseQueryString,
         responseType: 'json'
       });
       return (body.data.stops);
