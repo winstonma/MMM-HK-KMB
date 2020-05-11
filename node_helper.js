@@ -10,40 +10,43 @@ const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
 const BusRouteFetcher = require("./busroutefetcher.js");
-const BusStopsFetcher = require("./busstopsfetcher.js");
 
 const querystring = require('querystring');
 const got = require('got');
 
-
 module.exports = NodeHelper.create({
 
-  start: function () {
+  start: async function () {
     console.log("Starting node helper for: " + this.name);
     // Fetchers for all stops
     this.stopFetchers = [];
     // Fetchers for all ETAs
     this.etaFetchers = [];
     // All Stops info
-    this.AllStopsInfo = [];
+    this.AllStopsInfo = await this.getStopsInfo();
     
-    this.getStopsInfo();
+    console.log(this.AllStopsInfo.length)
   },
 
-  getStopsInfo: function () {
+  getStopsInfo: async function () {
     const self = this;
 
-    let fetcher = new BusStopsFetcher();
-    fetcher.onReceive(function (fetcher) {
-      self.AllStopsInfo = fetcher.items();
-    });
-    fetcher.onError(function (fetcher, error) {
-      self.sendSocketNotification("FETCH_ERROR", {
-        url: fetcher.url(),
-        error: error
+    const routeStopCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+
+    const parseQueryString = {
+      action: "getallstops"
+    };
+    const url = routeStopCheckUrl + querystring.stringify(parseQueryString);
+
+    try {
+      const { body } = await got.post(url, {
+        responseType: 'json'
       });
-    });
-    fetcher.startFetch();
+      return (body.data.stops);
+    } catch (error) {
+      console.log("Error obtaining BusRoute connections: " + error.response.body);
+      fetchFailedCallback(self, error);
+    }
   },
 
   socketNotificationReceived: function (notification, payload) {
