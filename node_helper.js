@@ -39,10 +39,10 @@ module.exports = NodeHelper.create({
         searchParams: parseQueryString,
         responseType: 'json'
       });
-      return (body.data.stops);
+      return body.data.stops;
     } catch (error) {
       console.log("Error obtaining BusRoute connections: " + error.response.body);
-      fetchFailedCallback(self, error);
+      return [];
     }
   },
 
