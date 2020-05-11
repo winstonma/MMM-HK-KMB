@@ -11,6 +11,9 @@ const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
 const BusRouteFetcher = require("./busroutefetcher.js");
 
+const querystring = require('querystring');
+const got = require('got');
+
 module.exports = NodeHelper.create({
 
   start: function () {
@@ -19,8 +22,6 @@ module.exports = NodeHelper.create({
     this.stopFetchers = [];
     // Fetchers for all ETAs
     this.etaFetchers = [];
-    // Stores the lookup of Stop ID and Stop Name
-    this.stopName = [];
   },
 
   socketNotificationReceived: function (notification, payload) {
@@ -29,7 +30,6 @@ module.exports = NodeHelper.create({
       for (var f in payload.config) {
         var stopID = payload.config[f].stopID;
         // Create a new entry with no stop name
-        this.stopName[stopID] = '';
         this.getStopInfo(stopID);
       }
       return;
@@ -48,6 +48,7 @@ module.exports = NodeHelper.create({
 
   /*
    * Obtain the route that pass through this bus stop
+   *
    * @param {stopID} the stop ID of the bus stop
    */
   getStopInfo: function (stopID) {
@@ -60,8 +61,29 @@ module.exports = NodeHelper.create({
       fetcher = new BusStopFetcher(stopID, reloadInterval);
       fetcher.onReceive(function (fetcher) {
         fetcher.items().map((info) => {
-          const routeList = info.data;
-          routeList.map((route) => self.createRouteFetcher(route.trim(), stopID));
+          const routeList = info.data.map((route) => route.trim());
+
+          const baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+          const parseQueryString = {
+            action: "getallstops"
+          };
+          const url = baseUrl + querystring.stringify(parseQueryString);
+      
+          (async () => {
+            try {
+              const { body } = await got.post(url, {
+                responseType: 'json'
+              });
+              const stops = body.data.stops;
+              const match = stops.filter((stop) => stop.BSICode === stopID);
+              const stopName = match[0].CName;
+              routeList.map((route) => self.createRouteFetcher(route, stopID, stopName));
+              return match[0].CName;
+            } catch (error) {
+              console.log(error.response.body);
+            }
+          })();
+          
         })
       });
       fetcher.onError(function (fetcher, error) {
@@ -116,36 +138,29 @@ module.exports = NodeHelper.create({
     fetcher.startFetch();
   },
 
-  /* createRouteFetcher(route, stopID)
-   * Creates a fetcher for a new url if it doesn't exist yet.
+  /* createRouteFetcher(route, stopID, stopName)
+   * Creates a fetcher for obtaining the route info
    *
-   * attribute url string - URL of the news feed.
-   * attribute busStop number - BusStopID
+   * attribute route string - The route number
+   * attribute stopID string - Bus Stop ID
+   * attribute stopName string - Bus Stop Name
    */
-  createRouteFetcher: function (route, stopID) {
+  createRouteFetcher: function (route, stopID, stopName) {
     var self = this;
     var fetcher;
     fetcher = new BusRouteFetcher(route, stopID);
     fetcher.onReceive(function (fetcher) {
       // Keep relevant bounds and find the stop name
       fetcher.items().filter((routeInfo) => {
-        // Find out the stop name
-        if (self.stopName[stopID] === '') {
-          const match = routeInfo.routeStops.filter(stops => stops.BSICode === stopID);
-          if (match.length == 1) {
-            // Find the exact match, store the stop name
-            self.stopName[stopID] = match[0].CName;
-          }
-        }
-
         // Finding the matching stops from the bus route
         const match = routeInfo.routeStops.filter((stops) => {
-          if (self.stopName[stopID] === '')
+          // It should not happen
+          if (stopName === '')
             return false;
 
           return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
             stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
-            stops.CName == self.stopName[stopID]
+            stops.CName == stopName
           );
         });
 
