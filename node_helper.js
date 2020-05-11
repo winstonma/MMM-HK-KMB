@@ -14,24 +14,42 @@ const BusRouteFetcher = require("./busroutefetcher.js");
 const querystring = require('querystring');
 const got = require('got');
 
+
 module.exports = NodeHelper.create({
 
-  start: function () {
+  start: async function () {
     console.log("Starting node helper for: " + this.name);
     // Fetchers for all stops
     this.stopFetchers = [];
     // Fetchers for all ETAs
     this.etaFetchers = [];
+    // All Stops info
+    this.AllStopsInfo = await this.getStopsInfo();
+  },
+
+  getStopsInfo: async function () {
+    const baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+    const parseQueryString = {
+      action: "getallstops"
+    };
+    const url = baseUrl + querystring.stringify(parseQueryString);
+
+    try {
+      const { body } = await got.post(url, {
+        responseType: 'json'
+      });
+      return body.data.stops;
+    } catch (error) {
+      console.log(error.response.body);
+    }
   },
 
   socketNotificationReceived: function (notification, payload) {
     // Request for information
     if (notification === "ADD_STOPS") {
-      for (var f in payload.config) {
-        var stopID = payload.config[f].stopID;
-        // Create a new entry with no stop name
-        this.getStopInfo(stopID);
-      }
+      payload.config.map((item) => {
+        this.getStopInfo(item.stopID)
+      });
       return;
     }
   },
@@ -62,28 +80,7 @@ module.exports = NodeHelper.create({
       fetcher.onReceive(function (fetcher) {
         fetcher.items().map((info) => {
           const routeList = info.data.map((route) => route.trim());
-
-          const baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
-          const parseQueryString = {
-            action: "getallstops"
-          };
-          const url = baseUrl + querystring.stringify(parseQueryString);
-      
-          (async () => {
-            try {
-              const { body } = await got.post(url, {
-                responseType: 'json'
-              });
-              const stops = body.data.stops;
-              const match = stops.filter((stop) => stop.BSICode === stopID);
-              const stopName = match[0].CName;
-              routeList.map((route) => self.createRouteFetcher(route, stopID, stopName));
-              return match[0].CName;
-            } catch (error) {
-              console.log(error.response.body);
-            }
-          })();
-          
+          routeList.map((route) => self.createRouteFetcher(route, stopID));
         })
       });
       fetcher.onError(function (fetcher, error) {
@@ -145,10 +142,15 @@ module.exports = NodeHelper.create({
    * attribute stopID string - Bus Stop ID
    * attribute stopName string - Bus Stop Name
    */
-  createRouteFetcher: function (route, stopID, stopName) {
+  createRouteFetcher: function (route, stopID) {
     var self = this;
     var fetcher;
     fetcher = new BusRouteFetcher(route, stopID);
+
+    // Find the stop name
+    const stopInfo = self.AllStopsInfo.filter((stop) => stop.BSICode === stopID)[0];
+    const stopName = stopInfo.CName;
+
     fetcher.onReceive(function (fetcher) {
       // Keep relevant bounds and find the stop name
       fetcher.items().filter((routeInfo) => {
