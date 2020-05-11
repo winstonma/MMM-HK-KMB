@@ -24,8 +24,6 @@ module.exports = NodeHelper.create({
     this.etaFetchers = [];
     // All Stops info
     this.AllStopsInfo = await this.getStopsInfo();
-    
-    console.log(this.AllStopsInfo.length)
   },
 
   getStopsInfo: async function () {
