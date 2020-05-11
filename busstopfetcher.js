@@ -11,11 +11,8 @@ var schedule = require('node-schedule');
 
 var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
-var BusStopFetcher = function (stopID, reloadInterval) {
+var BusStopFetcher = function (stopID) {
   var self = this;
-  if (reloadInterval < 1000) {
-    reloadInterval = 1000;
-  }
 
   var items = [];
 
@@ -67,17 +64,6 @@ var BusStopFetcher = function (stopID, reloadInterval) {
 
   /* public methods */
 
-  /* setReloadInterval()
-   * Update the reload interval, but only if we need to increase the speed.
-   *
-   * attribute interval number - Interval for the update in milliseconds.
-   */
-  this.setReloadInterval = function (interval) {
-    if (interval > 1000 && interval < reloadInterval) {
-      reloadInterval = interval;
-    }
-  };
-
   /* startFetch()
    * Initiate fetchBusStop();
    */
@@ -93,7 +79,7 @@ var BusStopFetcher = function (stopID, reloadInterval) {
       //console.log('No items to broadcast yet.');
       return;
     }
-    console.log('Broadcasting ' + items.length + ' items.');
+    //console.log('Broadcasting ' + items.length + ' items.');
     itemsReceivedCallback(self);
   };
 

@@ -73,12 +73,11 @@ module.exports = NodeHelper.create({
    */
   getStopInfo: function (stopID) {
     var self = this;
-    var reloadInterval = config.reloadInterval || 5 * 60 * 1000;
     var fetcher;
 
     if (typeof self.stopFetchers[stopID] === "undefined") {
-      console.log("Create new stop fetcher for stopID: " + stopID + " - Interval: " + reloadInterval);
-      fetcher = new BusStopFetcher(stopID, reloadInterval);
+      console.log("Create new stop fetcher for stopID: " + stopID);
+      fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
         fetcher.items().map((info) => {
           const routeList = info.data.map((route) => route.trim());
@@ -95,7 +94,6 @@ module.exports = NodeHelper.create({
     } else {
       console.log("Use existing Stop fetcher for stopID: " + stopID);
       fetcher = self.stopFetchers[stopID];
-      fetcher.setReloadInterval(reloadInterval);
       fetcher.broadcastItems();
     }
     fetcher.startFetch();
