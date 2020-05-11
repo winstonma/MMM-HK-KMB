@@ -77,11 +77,17 @@ Module.register("MMM-HK-KMB", {
     if (notification === "ETA_ITEMS") {
       // The feed itself contains all the ETAs
       this.etaItems = payload.sort(function (a, b) {
+        if (a.stopInfo.Seq != b.stopInfo.Seq) {
+          if (a.stopInfo.Seq === "999")
+            return 1;
+          if (b.stopInfo.Seq === "999")
+            return -1;
+        }
         if (a.stopInfo.BSICode > b.stopInfo.BSICode)
           return -1;
         if (a.stopInfo.BSICode < b.stopInfo.BSICode)
           return 1;
-        if (a.stopInfo.Route < b.stopInfo.Route) 
+        if (a.stopInfo.Route < b.stopInfo.Route)
           return -1;
         return 1;
       });
@@ -157,6 +163,7 @@ Module.register("MMM-HK-KMB", {
       var etaObj = this.etaItems[t];
 
       if (etaObj.response.length == 1 && this.containsAny(etaObj.response[0].t, NOBUSINDICATORLIST)) {
+        // Route with no active ETA
         nonActiveRoute.push(etaObj.stopInfo.Route);
       } else {
         data = this.createDataRow(etaObj);
