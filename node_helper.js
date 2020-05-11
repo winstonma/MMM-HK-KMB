@@ -166,7 +166,7 @@ module.exports = NodeHelper.create({
           );
         });
 
-        if (match.length >= 1) {
+        if (match.length > 1) {
           // If there are more than 1 stops, then we need exact BSI-Code match
           match = match.filter((stop) => {
             return (stop.BSICode === stopID);
@@ -176,12 +176,12 @@ module.exports = NodeHelper.create({
         switch (match.length) {
           case 0:
             break;
-          case 1:
-            match[0].basicInfo = routeInfo.basicInfo;
-            self.createETAFetcher(match[0]);
-            break;
           default:
-            console.log("It shouldn't be happening")
+            match.map((info) => {
+              info.basicInfo = routeInfo.basicInfo;
+              self.createETAFetcher(info);
+            });
+            break;
         }
       });
     });
