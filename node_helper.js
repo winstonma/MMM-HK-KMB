@@ -155,22 +155,33 @@ module.exports = NodeHelper.create({
       // Keep relevant bounds and find the stop name
       fetcher.items().filter((routeInfo) => {
         // Finding the matching stops from the bus route
-        const match = routeInfo.routeStops.filter((stops) => {
+        let match = routeInfo.routeStops.filter((stop) => {
           // It should not happen
           if (stopName === '')
             return false;
 
-          return (stops.BSICode.split("-")[0] === stopID.split("-")[0] &&
-            stops.BSICode.split("-")[1] === stopID.split("-")[1] &&
-            stops.CName == stopName
+          return (stop.BSICode.split("-")[0] === stopID.split("-")[0] &&
+            stop.BSICode.split("-")[1] === stopID.split("-")[1] &&
+            stop.CName == stopName
           );
         });
 
         if (match.length >= 1) {
-          match.map((info) => {
-            info.basicInfo = routeInfo.basicInfo;
-            self.createETAFetcher(info);
+          // If there are more than 1 stops, then we need exact BSI-Code match
+          match = match.filter((stop) => {
+            return (stop.BSICode === stopID);
           });
+        }
+
+        switch (match.length) {
+          case 0:
+            break;
+          case 1:
+            match[0].basicInfo = routeInfo.basicInfo;
+            self.createETAFetcher(match[0]);
+            break;
+          default:
+            console.log("It shouldn't be happening")
         }
       });
     });
