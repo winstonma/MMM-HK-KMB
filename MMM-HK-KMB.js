@@ -272,7 +272,7 @@ Module.register("MMM-HK-KMB", {
       etaArray = [];
       for (r in etaInfo) {
         let etaStr = etaInfo[r].t;
-        const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/ /g, '');
+        const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/\s/g, '');
         etaArray.push(eta);
       }
       departure.innerHTML = etaArray.toString();
