@@ -5,8 +5,8 @@
  * MIT Licensed.
  */
 
-var request = require("request");
-var querystring = require('querystring');
+const got = require('got');
+const querystring = require('querystring');
 
 const etaUrl = "http://etav3.kmb.hk/?"
 
@@ -49,26 +49,21 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
     reloadTimer = null;
     items = [];
 
-    request(url, (error, response, body) => {
-      if (response.statusCode === 200) {
-        responseObj = JSON.parse(body);
-        if (!responseObj || responseObj.responsecode != 0) {
-          console.log("Error obtaining ETA connections " + response.statusCode);
-          fetchFailedCallback(self, error);
-          scheduleTimer();
-        }
-        //responseObj.url = url;
-        responseObj.stopInfo = stopInfo;
-        items.push(responseObj);
+    (async () => {
+      try {
+        const { body } = await got(url, {
+          responseType: 'json'
+        });
+        body.stopInfo = stopInfo;
+        items.push(body);
         self.broadcastItems();
         scheduleTimer();
-      } else {
-        console.log("Error getting ETA connections " + response.statusCode);
+      } catch (error) {
+        console.log(error.response.body);
         fetchFailedCallback(self, error);
         scheduleTimer();
       }
-    });
-
+    })();
   };
 
 	/* scheduleTimer()
