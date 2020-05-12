@@ -14,7 +14,7 @@ Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</s
 
 ## Current version
 
-v1.1.0
+v1.1.2
 
 ## Languages
 As of version 1.0.0, MMM-HK-KMB features language support for `Chinese (zh)` and `English (en)` mirrors.
@@ -24,8 +24,8 @@ A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/
  
 ## Dependencies
   * npm
-  * [request](https://www.npmjs.com/package/request)
   * [node-schedule](https://www.npmjs.com/package/node-schedule)
+  * [got](https://www.npmjs.com/package/got)
 
 ## Installation
 To add this module, go to MagicMirror folder and run the following command

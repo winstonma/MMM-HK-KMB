@@ -5,9 +5,9 @@
  * MIT Licensed.
  */
 
-var request = require("request");
-var querystring = require('querystring');
-var schedule = require('node-schedule');
+const got = require('got');
+const querystring = require('querystring');
+const schedule = require('node-schedule');
 
 var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
@@ -40,26 +40,23 @@ var BusStopFetcher = function (stopID) {
       action: "getRoutesInStop",
       bsiCode: stopID
     };
-    url = baseUrl + querystring.stringify(parseQueryString);
+    const url = baseUrl + querystring.stringify(parseQueryString);
     reloadTimer = null;
     items = [];
 
-    request.post(url, (error, response, body) => {
-      if (error) {
-        console.log("Error obtaining BusStop connections: " + error);
-        fetchFailedCallback(self, error);
-      }
-      responseObj = JSON.parse(body);
-      if (!responseObj || !responseObj.result) {
-        console.log("Error obtaining BusStop connections " + response.statusCode);
-        fetchFailedCallback(self, error);
-      } else {
-        responseObj.url = url;
-        items.push(responseObj);
+    (async () => {
+      try {
+        const { body } = await got.post(url, {
+          responseType: 'json'
+        });
+        body.url = url;
+        items.push(body);
         self.broadcastItems();
+      } catch (error) {
+        console.log(error.response.body);
+        fetchFailedCallback(self, error);
       }
-    });
-
+    })();
   };
 
   /* public methods */

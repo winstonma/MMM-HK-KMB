@@ -1,6 +1,9 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.1.2] - 2020-05-12
+* Replace request package with got
+
 ## [1.1.1] - 2020-05-11
 * Fix the route matching algorithum
 

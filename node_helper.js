@@ -4,7 +4,6 @@
  * By yo-less
  * MIT Licensed.
  */
-const request = require('request');
 const NodeHelper = require("node_helper");
 const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
@@ -15,14 +14,16 @@ const got = require('got');
 
 module.exports = NodeHelper.create({
 
-  start: async function () {
+  start: function () {
     console.log("Starting node helper for: " + this.name);
     // Fetchers for all stops
     this.stopFetchers = [];
     // Fetchers for all ETAs
     this.etaFetchers = [];
     // All Stops info
-    this.AllStopsInfo = await this.getStopsInfo();
+    this.AllStopsInfo;
+    
+    this.getStopsInfo();
   },
 
   getStopsInfo: async function () {
@@ -34,16 +35,18 @@ module.exports = NodeHelper.create({
       action: "getallstops"
     };
 
-    try {
-      const { body } = await got.post(routeStopCheckUrl, {
-        searchParams: parseQueryString,
-        responseType: 'json'
-      });
-      return body.data.stops;
-    } catch (error) {
-      console.log("Error obtaining BusRoute connections: " + error.response.body);
-      return [];
-    }
+    (async () => {
+      try {
+        const { body } = await got.post(routeStopCheckUrl, {
+          searchParams: parseQueryString,
+          responseType: 'json'
+        });
+        this.AllStopsInfo = body.data.stops;
+      } catch (error) {
+        console.log("Error obtaining BusRoute connections: " + error.response.body);
+        this.AllStopsInfo = [];
+      }
+    })();    
   },
 
   socketNotificationReceived: function (notification, payload) {
@@ -52,18 +55,20 @@ module.exports = NodeHelper.create({
       payload.config.map((item) => {
         this.getStopInfo(item.stopID)
       });
-      return;
     }
   },
 
   getData: function (options, stopID) {
-    request(options, (error, response, body) => {
-      if (response.statusCode === 200) {
+    (async () => {
+      try {
+        const { body } = await got(options, {
+          responseType: 'json'
+        });
         this.sendSocketNotification("KMBETA" + stopID, JSON.parse(body));
-      } else {
+      } catch (error) {
         console.log("Error getting tram connections " + response.statusCode);
       }
-    });
+    })();
   },
 
   /*
