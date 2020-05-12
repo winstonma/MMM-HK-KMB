@@ -5,8 +5,7 @@
  * MIT Licensed.
  */
 
-var request = require("request");
-var querystring = require('querystring');
+const got = require('got');
 
 const routeBoundCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
@@ -28,28 +27,26 @@ var BusRouteFetcher = function (route, stopID) {
   var fetchBusRoute = function () {
     items = [];
 
-    var parseQueryString = {
+    const parseQueryString = {
       action: 'getroutebound',
       route: route.trim()
     };
-    url = routeBoundCheckUrl + querystring.stringify(parseQueryString);
 
-    request.post(url, (error, response, body) => {
-      if (error) {
-        console.log("Error obtaining BusRoute connections: " + error);
+    (async () => {
+      try {
+        const { body } = await got.post(routeBoundCheckUrl, {
+          searchParams: parseQueryString,
+          responseType: 'json'
+        });
+        for (f in body.data) {
+          routeObj = body.data[f];
+          fetchBusRouteInfo(routeObj);
+        }
+      } catch (error) {
+        console.log(error.response.body);
         fetchFailedCallback(self, error);
       }
-      responseObj = JSON.parse(body);
-      if (!responseObj || !responseObj.result) {
-        console.log("BusRoute response error: " + response.statusCode);
-        fetchFailedCallback(self, error);
-      }
-      for (f in responseObj.data) {
-        routeObj = responseObj.data[f];
-        fetchBusRouteInfo(routeObj);
-      }
-    });
-
+    })();
   };
 
   /* fetchBusRouteInfo()
@@ -63,32 +60,26 @@ var BusRouteFetcher = function (route, stopID) {
     }
     items = [];
 
-    var parseQueryString = {
+    const parseQueryString = {
       action: 'getstops',
       route: routeObj.ROUTE,
       bound: routeObj.BOUND,
       serviceType: routeObj.SERVICE_TYPE
     };
-    url = routeBoundCheckUrl + querystring.stringify(parseQueryString);
 
-    request.post(url, (error, response, body) => {
-      if (error) {
-        console.log("Error getting BusRoute connections: " + error);
+    (async () => {
+      try {
+        const { body } = await got.post(routeBoundCheckUrl, {
+          searchParams: parseQueryString,
+          responseType: 'json'
+        });
+        items.push(body.data);
+        self.broadcastItems();
+      } catch (error) {
+        console.log(error.response.body);
         fetchFailedCallback(self, error);
-        scheduleTimer();
-      } else {
-        responseObj = JSON.parse(body);
-        if (!responseObj || !responseObj.result) {
-          console.log("Error obtaining BusRoute connections " + response.statusCode);
-          fetchFailedCallback(self, error);
-          scheduleTimer();
-        } else {
-          // Return all the values, the filtering process will be done on the upper level
-          items.push(responseObj.data);
-          self.broadcastItems();
-        }
       }
-    });
+    })();
   };
 
   /* scheduleTimer()
