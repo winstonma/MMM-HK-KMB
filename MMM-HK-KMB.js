@@ -63,13 +63,12 @@ Module.register("MMM-HK-KMB", {
    * registers the feeds to be used by the backend.
    */
   registerETAs: function () {
-    for (var f in this.config.ETAs) {
-      var eta = this.config.ETAs[f];
+    this.config.ETAs.map((eta) => {
       this.sendSocketNotification("ADD_ETA", {
         feed: eta,
         config: this.config
       });
-    }
+    });
   },
 
 
@@ -95,43 +94,8 @@ Module.register("MMM-HK-KMB", {
     }
   },
 
-  /* subscribedToFeed(feedUrl)
-   * Check if this module is configured to show this feed.
-   *
-   * attribute feedUrl string - Url of the feed to check.
-   *
-   * returns bool
-   */
-  subscribedToFeed: function (feedUrl) {
-    for (var f in this.config.ETAs) {
-      var feed = this.config.ETAs[f];
-      if (feed.url === feedUrl) {
-        return true;
-      }
-    }
-    return false;
-  },
-
-  /* subscribedToFeed(feedUrl)
-   * Returns title for a specific feed Url.
-   *
-   * attribute feedUrl string - Url of the feed to check.
-   *
-   * returns string
-   */
-  titleForFeed: function (feedUrl) {
-    for (var f in this.config.ETAs) {
-      var feed = this.config.ETAs[f];
-      if (feed.url === feedUrl) {
-        return feed.title || "";
-      }
-    }
-    return "";
-  },
-
   getDom: function () {
-
-    var wrapper = document.createElement("div");
+    let wrapper = document.createElement("div");
 
     if (this.activeItem >= this.etaItems.length) {
       this.activeItem = 0;
@@ -144,12 +108,12 @@ Module.register("MMM-HK-KMB", {
       return wrapper;
     }
 
-    var header = document.createElement("header");
+    let header = document.createElement("header");
     header.innerHTML = (this.etaItems.length > 0) ? this.etaItems[0].stopInfo.CName : this.config.stopName;
     wrapper.appendChild(header);
 
     // Start creating connections table
-    var table = document.createElement("table");
+    let table = document.createElement("table");
     table.classList.add("small", "table");
     table.border = '0';
 
@@ -158,21 +122,17 @@ Module.register("MMM-HK-KMB", {
     table.appendChild(this.createSpacerRow());
 
     let nonActiveRoute = [];
+    let activeRoute = [];
 
-    for (t in this.etaItems) {
-      var etaObj = this.etaItems[t];
+    [nonActiveRoute, activeRoute] = this.partition(this.etaItems, (e) => e.response.length == 1 && this.containsAny(e.response[0].t, NOBUSINDICATORLIST));
 
-      if (etaObj.response.length == 1 && this.containsAny(etaObj.response[0].t, NOBUSINDICATORLIST)) {
-        // Route with no active ETA
-        nonActiveRoute.push(etaObj.stopInfo.Route);
-      } else {
-        data = this.createDataRow(etaObj);
-        if (data != null)
-          table.appendChild(data);
-      }
-    }
+    activeRoute.map((etaObj) => {
+      data = this.createDataRow(etaObj);
+      if (data != null)
+        table.appendChild(data);
+    });
 
-    if (this.config.inactiveRouteCountPerRow != 0) {
+    if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
       table.appendChild(this.createSpacerRow());
       table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
     }
@@ -182,20 +142,26 @@ Module.register("MMM-HK-KMB", {
     return wrapper;
   },
 
-  createLabelRow: function () {
-    var labelRow = document.createElement("tr");
+  partition: function (array, isValid) {
+    return array.reduce(([pass, fail], elem) => {
+      return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
+    }, [[], []]);
+  },
 
-    var lineLabel = document.createElement("th");
+  createLabelRow: function () {
+    let labelRow = document.createElement("tr");
+
+    let lineLabel = document.createElement("th");
     lineLabel.className = "line";
     lineLabel.innerHTML = this.translate("LINE");
     labelRow.appendChild(lineLabel);
 
-    var destinationLabel = document.createElement("th");
+    let destinationLabel = document.createElement("th");
     destinationLabel.className = "destination";
     destinationLabel.innerHTML = this.translate("DESTINATION");
     labelRow.appendChild(destinationLabel);
 
-    var departureLabel = document.createElement("th");
+    let departureLabel = document.createElement("th");
     departureLabel.className = "departure";
     departureLabel.innerHTML = this.translate("DEPARTURE");
     labelRow.appendChild(departureLabel);
@@ -204,9 +170,9 @@ Module.register("MMM-HK-KMB", {
   },
 
   createSpacerRow: function () {
-    var spacerRow = document.createElement("tr");
+    let spacerRow = document.createElement("tr");
 
-    var spacerHeader = document.createElement("th");
+    let spacerHeader = document.createElement("th");
     spacerHeader.className = "spacerRow";
     spacerHeader.setAttribute("colSpan", "3");
     spacerHeader.innerHTML = "";
@@ -226,14 +192,14 @@ Module.register("MMM-HK-KMB", {
     nonActiveRouteDisplayList.forEach((nonActiveRouteDisplayRow, count) => {
       let labelRow = document.createElement("tr");
 
-      var lineLabel = document.createElement("th");
+      let lineLabel = document.createElement("th");
       if (count == 0) {
         lineLabel.className = "line";
         lineLabel.innerHTML = this.translate("INACTIVE");
       }
       labelRow.appendChild(lineLabel);
 
-      var destinationLabel = document.createElement("th");
+      let destinationLabel = document.createElement("th");
       destinationLabel.className = "destination";
       destinationLabel.innerHTML = nonActiveRouteDisplayRow;
       labelRow.appendChild(destinationLabel);
@@ -245,9 +211,9 @@ Module.register("MMM-HK-KMB", {
   },
 
   createNoTramRow: function () {
-    var noTramRow = document.createElement("tr");
+    let noTramRow = document.createElement("tr");
 
-    var noTramHeader = document.createElement("th");
+    let noTramHeader = document.createElement("th");
     noTramHeader.className = "noTramRow";
     noTramHeader.setAttribute("colSpan", "3");
     noTramHeader.innerHTML = this.translate("NO-TRAMS");
@@ -260,36 +226,36 @@ Module.register("MMM-HK-KMB", {
     if (!routeObj || routeObj.length == 0)
       return null;
 
-    var row = document.createElement("tr");
+    let row = document.createElement("tr");
 
-    var line = document.createElement("td");
+    let line = document.createElement("td");
     line.className = "line";
     line.innerHTML = routeObj.stopInfo.Route;
     row.appendChild(line);
 
-    var destination = document.createElement("td");
+    let destination = document.createElement("td");
     destination.className = "destination";
     destination.innerHTML = routeObj.stopInfo.basicInfo.DestCName;
     row.appendChild(destination);
 
     etaInfo = routeObj.response;
     if (etaInfo.length > 0) {
-      var departure = document.createElement("td");
+      let departure = document.createElement("td");
       departure.className = "departure";
       etaArray = [];
-      for (r in etaInfo) {
-        let etaStr = etaInfo[r].t;
+      etaInfo.map((etaInfoItem) => {
+        const etaStr = etaInfoItem.t;
         const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/\s/g, '');
         etaArray.push(eta);
-      }
+      });
       departure.innerHTML = etaArray.toString();
       row.appendChild(departure);
     }
     return row;
   },
 
-  replaceAll: function (str, mapObj) {
-    var re = new RegExp(Object.keys(mapObj).join("|"), "gi");
+  replaceAll: (str, mapObj) => {
+    const re = new RegExp(Object.keys(mapObj).join("|"), "gi");
 
     return str.replace(re, function (matched) {
       return mapObj[matched.toLowerCase()];
@@ -297,19 +263,18 @@ Module.register("MMM-HK-KMB", {
   },
 
   containsAny: function (str, items) {
-    for (var i in items) {
-      var item = items[i];
+    for (let i in items) {
+      let item = items[i];
       if (str.indexOf(item) > -1) {
         return true;
       }
-
     }
     return false;
   },
 
   chunkArrayInGroups: function (arr, size) {
-    var myArray = [];
-    for (var i = 0; i < arr.length; i += size) {
+    let myArray = [];
+    for (let i = 0; i < arr.length; i += size) {
       myArray.push(arr.slice(i, i + size));
     }
     return myArray;
