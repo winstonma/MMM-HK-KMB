@@ -9,8 +9,7 @@ Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</s
 
 ## Screenshots
 
-![Chinese version](screenshots/screenshot_zh.png)
-![English version](screenshots/screenshot_en.png)
+![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh.png)
 
 ## Current version
 
