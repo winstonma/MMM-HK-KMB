@@ -1,9 +1,10 @@
 /* Magic Mirror
- * Module: KMB
+ * Module: MMM-HK-Transport
  *
- * By yo-less
+ * By Winston / https://github.com/winstonma
  * MIT Licensed.
  */
+
 const NodeHelper = require("node_helper");
 const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
