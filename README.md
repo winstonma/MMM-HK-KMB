@@ -7,6 +7,9 @@ It's always nice to see mirrors using my work, so feel free to send me some scre
 
 Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</sup> Forum](http://forum.magicmirror.builders/)?
 
+## Reverse Engineering Process
+I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-mmm-hk-kmb-module-db6eb0181eb6) about the reverse engineering process. Hope you could enjoy.
+
 ## Screenshots
 
 ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh.png)
