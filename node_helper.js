@@ -111,40 +111,15 @@ module.exports = NodeHelper.create({
     fetcher.startFetch();
   },
 
-  /* Find a stop match
-   */
-  findStopMatch: function (stopInfo) {
-    const self = this;
-
-    let match = Object.fromEntries(Object.entries(self.stopFetchers).filter(([k, v]) => {
-      return (stopInfo.BSICode.split("-")[0] === v['stopInfo'].BSICode.split("-")[0] &&
-        stopInfo.BSICode.split("-")[1] === v['stopInfo'].BSICode.split("-")[1] &&
-        stopInfo.CName == v['stopInfo'].CName
-      );
-    }));
-
-    // Finding the matching stops from the bus route
-    if (Object.keys(match).length > 1) {
-      // If there are more than 1 stops, then we need exact BSI-Code match
-      match = Object.fromEntries(Object.entries(match).filter(([k, v]) =>
-        v['stopInfo'].BSICode === stopInfo.BSICode
-      ));
-    }
-
-    return Object.keys(match)[0];
-  },
-
   /* Creates a fetcher for collecting ETA info
    *
    * @param {stopInfo} the stop info (an object)
    */
-  createETAFetcher: function (stopInfo) {
+  createETAFetcher: function (stopInfo, stopID) {
     const self = this;
 
     const reloadInterval = 60 * 1000;
     let fetcher = new ETAFetcher(stopInfo, reloadInterval);
-
-    const stopFetcherKey = this.findStopMatch(stopInfo);
 
     const url = fetcher.url();
     if (!validUrl.isUri(url)) {
@@ -152,7 +127,7 @@ module.exports = NodeHelper.create({
       return;
     }
 
-    if (!Object.keys(this.stopFetchers[stopFetcherKey]["etaFetchers"]).includes(url)) {
+    if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(url)) {
       console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
@@ -164,10 +139,10 @@ module.exports = NodeHelper.create({
         });
       });
 
-      this.stopFetchers[stopFetcherKey]["etaFetchers"][url] = fetcher;
+      this.stopFetchers[stopID]["etaFetchers"][url] = fetcher;
     } else {
       console.log("Use existing ETA fetcher for url: " + url);
-      fetcher = this.stopFetchers[stopFetcherKey]["etaFetchers"][url];
+      fetcher = this.stopFetchers[stopID]["etaFetchers"][url];
       fetcher.broadcastItems();
     }
     fetcher.startFetch();
@@ -217,7 +192,7 @@ module.exports = NodeHelper.create({
           default:
             match.map((info) => {
               info.basicInfo = routeInfo.basicInfo;
-              self.createETAFetcher(info);
+              self.createETAFetcher(info, stopID);
             });
             break;
         }
