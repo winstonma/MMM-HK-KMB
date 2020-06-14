@@ -16,7 +16,7 @@ I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-m
 
 ## Current version
 
-v1.1.2
+v1.2.0
 
 ## Languages
 As of version 1.0.0, MMM-HK-KMB features language support for `Chinese (zh)` and `English (en)` mirrors.
