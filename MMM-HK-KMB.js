@@ -49,7 +49,7 @@ Module.register("MMM-HK-KMB", {
     Log.info("Starting module: " + this.name);
 
     // Collect the stop info (including the routes that the stop)
-    this.etaItems = [];
+    this.etaItems = {};
     this.activeItem = 0;
 
     this.sendSocketNotification("ADD_STOPS", {
@@ -74,70 +74,76 @@ Module.register("MMM-HK-KMB", {
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
-      // The feed itself contains all the ETAs
-      this.etaItems = payload.sort(function (a, b) {
-        if (a.stopInfo.Seq != b.stopInfo.Seq) {
-          if (a.stopInfo.Seq === "999")
-            return 1;
-          if (b.stopInfo.Seq === "999")
+      let data = {};
+      for (const [stopID, stopInfo] of Object.entries(payload)) {
+        const sortedETAs = stopInfo.etas.sort(function (a, b) {
+          if (a.stopInfo.Seq != b.stopInfo.Seq) {
+            if (a.stopInfo.Seq === "999")
+              return 1;
+            if (b.stopInfo.Seq === "999")
+              return -1;
+          }
+          if (a.stopInfo.BSICode > b.stopInfo.BSICode)
             return -1;
-        }
-        if (a.stopInfo.BSICode > b.stopInfo.BSICode)
-          return -1;
-        if (a.stopInfo.BSICode < b.stopInfo.BSICode)
+          if (a.stopInfo.BSICode < b.stopInfo.BSICode)
+            return 1;
+          if (a.stopInfo.Route < b.stopInfo.Route)
+            return -1;
           return 1;
-        if (a.stopInfo.Route < b.stopInfo.Route)
-          return -1;
-        return 1;
-      });
+        });
+        stopInfo.etas = sortedETAs;
+        data[stopID] = stopInfo;
+      }
+      this.etaItems = data;
       this.updateDom();
     }
   },
 
   getDom: function () {
     let wrapper = document.createElement("div");
+    for (const [stopID, stopInfo] of Object.entries(this.etaItems)) {
+      if (this.activeItem >= stopInfo.etas.length) {
+        this.activeItem = 0;
+      }
 
-    if (this.activeItem >= this.etaItems.length) {
-      this.activeItem = 0;
-    }
+      // Actually it is a new redraw
+      if (stopInfo === null) {
+        wrapper.innerHTML = this.translate("LOADING");
+        wrapper.className = "small dimmed";
+        return wrapper;
+      }
 
-    // Actually it is a new redraw
-    if (this.etaItems === null) {
-      wrapper.innerHTML = this.translate("LOADING");
-      wrapper.className = "small dimmed";
-      return wrapper;
-    }
+      let header = document.createElement("header");
+      header.innerHTML = (stopInfo.stopInfo != null) ? stopInfo.stopInfo.CName : this.config.stopName;
+      wrapper.appendChild(header);
 
-    let header = document.createElement("header");
-    header.innerHTML = (this.etaItems.length > 0) ? this.etaItems[0].stopInfo.CName : this.config.stopName;
-    wrapper.appendChild(header);
+      // Start creating connections table
+      let table = document.createElement("table");
+      table.classList.add("small", "table");
+      table.border = '0';
 
-    // Start creating connections table
-    let table = document.createElement("table");
-    table.classList.add("small", "table");
-    table.border = '0';
+      table.appendChild(this.createLabelRow());
 
-    table.appendChild(this.createLabelRow());
-
-    table.appendChild(this.createSpacerRow());
-
-    let nonActiveRoute = [];
-    let activeRoute = [];
-
-    [nonActiveRoute, activeRoute] = this.partition(this.etaItems, (e) => e.response.length == 1 && this.containsAny(e.response[0].t, NOBUSINDICATORLIST));
-
-    activeRoute.map((etaObj) => {
-      data = this.createDataRow(etaObj);
-      if (data != null)
-        table.appendChild(data);
-    });
-
-    if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
       table.appendChild(this.createSpacerRow());
-      table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
-    }
 
-    wrapper.appendChild(table);
+      let nonActiveRoute = [];
+      let activeRoute = [];
+
+      [nonActiveRoute, activeRoute] = this.partition(stopInfo.etas, (e) => e.response.length == 1 && this.containsAny(e.response[0].t, NOBUSINDICATORLIST));
+
+      activeRoute.map((etaObj) => {
+        data = this.createDataRow(etaObj);
+        if (data != null)
+          table.appendChild(data);
+      });
+
+      if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
+        table.appendChild(this.createSpacerRow());
+        table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
+      }
+
+      wrapper.appendChild(table);
+    }
 
     return wrapper;
   },

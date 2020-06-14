@@ -59,7 +59,7 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
         self.broadcastItems();
         scheduleTimer();
       } catch (error) {
-        console.log(error.response.body);
+        console.log(error);
         fetchFailedCallback(self, error);
         scheduleTimer();
       }

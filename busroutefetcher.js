@@ -10,12 +10,12 @@ const got = require('got');
 const routeBoundCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
 var BusRouteFetcher = function (route, stopID) {
-  var self = this;
+  const self = this;
 
-  var items = [];
+  let items = [];
 
-  var fetchFailedCallback = function () { };
-  var itemsReceivedCallback = function () { };
+  let fetchFailedCallback = function () { };
+  let itemsReceivedCallback = function () { };
 
   /* private methods */
 
@@ -24,7 +24,7 @@ var BusRouteFetcher = function (route, stopID) {
    * Example: http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?action=getroutebound&route=1
    * 
    */
-  var fetchBusRoute = function () {
+  const fetchBusRoute = function () {
     items = [];
 
     const parseQueryString = {
@@ -53,7 +53,7 @@ var BusRouteFetcher = function (route, stopID) {
    * To obtain the list of bus stops
    * Example: http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?action=getstops&route=1&bound=1&serviceType=1
    */
-  var fetchBusRouteInfo = function (routeObj) {
+  const fetchBusRouteInfo = function (routeObj) {
     // Assumption: Only the main service type is served
     if (routeObj.SERVICE_TYPE != 1) {
       return;
@@ -76,7 +76,7 @@ var BusRouteFetcher = function (route, stopID) {
         items.push(body.data);
         self.broadcastItems();
       } catch (error) {
-        console.log(error.response.body);
+        console.log(error);
         fetchFailedCallback(self, error);
       }
     })();
@@ -86,7 +86,7 @@ var BusRouteFetcher = function (route, stopID) {
    * Schedule the timer for the next update.
    */
 
-  var scheduleTimer = function () {
+  const scheduleTimer = function () {
     //console.log('Schedule update timer.');
     clearTimeout(reloadTimer);
     reloadTimer = setTimeout(function () {
@@ -124,7 +124,8 @@ var BusRouteFetcher = function (route, stopID) {
   };
 
   this.url = function () {
-    return url;
+    //return url;
+    return null;
   };
 
   this.items = function () {

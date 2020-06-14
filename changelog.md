@@ -1,6 +1,9 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.2.0] - 2020-06-14
+* Support multiple stops
+
 ## [1.1.2] - 2020-05-12
 * Replace request package with got
 

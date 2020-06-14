@@ -14,7 +14,7 @@ var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 var BusStopFetcher = function (stopID) {
   var self = this;
 
-  var items = null;
+  var item = null;
 
   // Create a schdule to fetch
   var rule = new schedule.RecurrenceRule();
@@ -42,7 +42,7 @@ var BusStopFetcher = function (stopID) {
     };
     const url = baseUrl + querystring.stringify(parseQueryString);
     reloadTimer = null;
-    items = null;
+    item = null;
 
     (async () => {
       try {
@@ -50,8 +50,7 @@ var BusStopFetcher = function (stopID) {
           responseType: 'json'
         });
         body.url = url;
-        items = body;
-        //items.push(body);
+        item = body;
         self.broadcastItems();
       } catch (error) {
         console.log(error);
@@ -73,7 +72,7 @@ var BusStopFetcher = function (stopID) {
    * Broadcast the existing items.
    */
   this.broadcastItems = function () {
-    if (items == null) {
+    if (item == null) {
       return;
     }
     itemsReceivedCallback(self);
@@ -95,8 +94,8 @@ var BusStopFetcher = function (stopID) {
     return stopID;
   };
 
-  this.items = function () {
-    return items;
+  this.item = function () {
+    return item;
   };
 };
 
