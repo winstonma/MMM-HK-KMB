@@ -45,7 +45,7 @@ module.exports = NodeHelper.create({
         });
         this.AllStopsInfo = body.data.stops;
       } catch (error) {
-        console.log("Error obtaining BusRoute connections: " + error.response.body);
+        console.log("Error obtaining BusRoute connections: " + error);
         this.AllStopsInfo = [];
       }
     })();
