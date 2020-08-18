@@ -31,7 +31,7 @@ module.exports = NodeHelper.create({
   getStopsInfo: async function () {
     const self = this;
 
-    const routeStopCheckUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+    const routeStopCheckUrl = "https://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
 
     const parseQueryString = {
       action: "getallstops"
