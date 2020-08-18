@@ -121,14 +121,10 @@ module.exports = NodeHelper.create({
     const reloadInterval = 60 * 1000;
     let fetcher = new ETAFetcher(stopInfo, reloadInterval);
 
-    const url = fetcher.url();
-    if (!validUrl.isUri(url)) {
-      self.sendSocketNotification("INCORRECT_URL", url);
-      return;
-    }
+    const fetcherKey = stopInfo.Route + stopInfo.Bound + stopInfo.ServiceType + stopInfo.Seq;
 
-    if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(url)) {
-      console.log("Create new ETA fetcher for url: " + url + " - Interval: " + reloadInterval);
+   if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
+      console.log("Create new ETA fetcher for route: " + stopInfo.Route + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
       });
@@ -139,10 +135,10 @@ module.exports = NodeHelper.create({
         });
       });
 
-      this.stopFetchers[stopID]["etaFetchers"][url] = fetcher;
+      this.stopFetchers[stopID]["etaFetchers"][fetcherKey] = fetcher;
     } else {
-      console.log("Use existing ETA fetcher for url: " + url);
-      fetcher = this.stopFetchers[stopID]["etaFetchers"][url];
+      console.log("Use existing ETA fetcher for route: " + stopInfo.Route);
+      fetcher = this.stopFetchers[stopID]["etaFetchers"][fetcherKey];
       fetcher.broadcastItems();
     }
     fetcher.startFetch();

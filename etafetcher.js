@@ -7,8 +7,9 @@
 
 const got = require('got');
 const querystring = require('querystring');
+const Secret = require('./secret.js');
 
-const etaUrl = "http://etav3.kmb.hk/?"
+const etaUrl = "https://etav3.kmb.hk/?"
 
 /* ETAFetcher
 
@@ -28,14 +29,23 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
   var fetchFailedCallback = function () { };
   var itemsReceivedCallback = function () { };
 
+  const secret = Secret.getSecret(new Date().toISOString().split('.')[0] + 'Z');
+  let VENDOR_ID = '';
+  for (let i = 0; i < 16; ++i) {
+    VENDOR_ID += Math.floor(Math.random() * 16).toString(16);
+  }
+
   // Generate Url
   const parseQueryString = {
     action: "geteta",
     lang: "tc",
     route: stopInfo.Route,
     bound: stopInfo.Bound,
-    stop: stopInfo.BSICode,
-    stop_seq: stopInfo.Seq
+    service_type: stopInfo.ServiceType,
+    stop_seq: stopInfo.Seq,
+    vendor_id: VENDOR_ID,
+    apiKey: secret.apiKey,
+    ctr: secret.ctr
   };
   const url = etaUrl + querystring.stringify(parseQueryString);
 
@@ -52,10 +62,18 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
     (async () => {
       try {
         const { body } = await got(url, {
-          responseType: 'json'
+          responseType: 'json',
+          https: {
+            rejectUnauthorized: false
+          }
         });
-        body.stopInfo = stopInfo;
-        items.push(body);
+        let item = {
+          eta: body[0],
+          stopInfo: stopInfo
+        };
+        items.push(item);
+        //body.stopInfo = stopInfo;
+        //items.push(body);
         self.broadcastItems();
         scheduleTimer();
       } catch (error) {

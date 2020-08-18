@@ -129,7 +129,7 @@ Module.register("MMM-HK-KMB", {
       let nonActiveRoute = [];
       let activeRoute = [];
 
-      [nonActiveRoute, activeRoute] = this.partition(stopInfo.etas, (e) => e.response.length == 1 && this.containsAny(e.response[0].t, NOBUSINDICATORLIST));
+      [nonActiveRoute, activeRoute] = this.partition(stopInfo.etas, (e) => e.hasOwnProperty('eta') && this.containsAny(e.eta.eta[0].t, NOBUSINDICATORLIST));
 
       activeRoute.map((etaObj) => {
         data = this.createDataRow(etaObj);
@@ -244,12 +244,12 @@ Module.register("MMM-HK-KMB", {
     destination.innerHTML = routeObj.stopInfo.basicInfo.DestCName;
     row.appendChild(destination);
 
-    etaInfo = routeObj.response;
-    if (etaInfo.length > 0) {
+    etaInfo = routeObj;
+    if (etaInfo.hasOwnProperty('eta')) {
       let departure = document.createElement("td");
       departure.className = "departure";
       etaArray = [];
-      etaInfo.map((etaInfoItem) => {
+      etaInfo.eta.eta.map((etaInfoItem) => {
         const etaStr = etaInfoItem.t;
         const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/\s/g, '');
         etaArray.push(eta);
