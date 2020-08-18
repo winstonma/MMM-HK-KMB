@@ -29,25 +29,7 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
   var fetchFailedCallback = function () { };
   var itemsReceivedCallback = function () { };
 
-  const secret = Secret.getSecret(new Date().toISOString().split('.')[0] + 'Z');
-  let VENDOR_ID = '';
-  for (let i = 0; i < 16; ++i) {
-    VENDOR_ID += Math.floor(Math.random() * 16).toString(16);
-  }
-
-  // Generate Url
-  const parseQueryString = {
-    action: "geteta",
-    lang: "tc",
-    route: stopInfo.Route,
-    bound: stopInfo.Bound,
-    service_type: stopInfo.ServiceType,
-    stop_seq: stopInfo.Seq,
-    vendor_id: VENDOR_ID,
-    apiKey: secret.apiKey,
-    ctr: secret.ctr
-  };
-  const url = etaUrl + querystring.stringify(parseQueryString);
+  let url;
 
   /* private methods */
 
@@ -58,6 +40,27 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
     clearTimeout(reloadTimer);
     reloadTimer = null;
     items = [];
+
+    const secret = Secret.getSecret(new Date().toISOString().split('.')[0] + 'Z');
+    let VENDOR_ID = '';
+    for (let i = 0; i < 16; ++i) {
+      VENDOR_ID += Math.floor(Math.random() * 16).toString(16);
+    }
+  
+    // Generate Url
+    const parseQueryString = {
+      action: "geteta",
+      lang: "tc",
+      route: stopInfo.Route,
+      bound: stopInfo.Bound,
+      service_type: stopInfo.ServiceType,
+      stop_seq: stopInfo.Seq,
+      vendor_id: VENDOR_ID,
+      apiKey: secret.apiKey,
+      ctr: secret.ctr
+    };
+
+    url = etaUrl + querystring.stringify(parseQueryString);
 
     (async () => {
       try {
@@ -77,7 +80,9 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
         self.broadcastItems();
         scheduleTimer();
       } catch (error) {
-        console.log(error);
+        // Suppress the error message
+        //console.log("Got error for ETA url: " + url);
+        //console.log(error);
         fetchFailedCallback(self, error);
         scheduleTimer();
       }
