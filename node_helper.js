@@ -123,7 +123,7 @@ module.exports = NodeHelper.create({
 
     const fetcherKey = stopInfo.Route + stopInfo.Bound + stopInfo.ServiceType + stopInfo.Seq;
 
-   if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
+    if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
       console.log("Create new ETA fetcher for route: " + stopInfo.Route + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
