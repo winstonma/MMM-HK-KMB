@@ -75,7 +75,18 @@ Module.register("MMM-HK-KMB", {
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
       let data = {};
-      for (const [stopID, stopInfo] of Object.entries(payload)) {
+      // Filter ETA items
+      const stopList = this.config.stops.map(item => Object.values(item)[0]);
+      const filteredData = Object.keys(payload)
+        .filter(key => stopList.includes(key))
+        .reduce((obj, key) => {
+          return {
+            ...obj,
+            [key]: payload[key]
+          };
+        }, {});
+
+      for (const [stopID, stopInfo] of Object.entries(filteredData)) {
         const sortedETAs = stopInfo.etas.sort(function (a, b) {
           if (a.stopInfo.Seq != b.stopInfo.Seq) {
             if (a.stopInfo.Seq === "999")
