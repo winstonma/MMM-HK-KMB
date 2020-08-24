@@ -1,6 +1,9 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.4.0] - 2020-08-24
+* Uses [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta) script to fetch the KMB related info
+
 ## [1.3.0] - 2020-08-18
 * Use new ETA fetching method
 

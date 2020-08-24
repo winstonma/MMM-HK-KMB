@@ -5,11 +5,9 @@
  * MIT Licensed.
  */
 
-const got = require('got');
-const querystring = require('querystring');
 const schedule = require('node-schedule');
-
-var baseUrl = "http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
+const StopRoute = require('./scripts/StopRoute.js');
+const Stop = require('./scripts/Stop.js');
 
 var BusStopFetcher = function (stopID) {
   var self = this;
@@ -35,28 +33,26 @@ var BusStopFetcher = function (stopID) {
    * Find out what route passes this bus stop
    */
 
-  const fetchBusStop = function () {
-    const parseQueryString = {
-      action: "getRoutesInStop",
-      bsiCode: stopID
-    };
-    const url = baseUrl + querystring.stringify(parseQueryString);
-    reloadTimer = null;
-    item = null;
+  const update_common_route_list = function (/** Object<string, Array<StopRoute>> */ result) {
+    item = result;
+    console.log("update_common_route_list");
+    self.broadcastItems();
+  }
 
-    (async () => {
-      try {
-        const { body } = await got.post(url, {
-          responseType: 'json'
-        });
-        body.url = url;
-        item = body;
-        self.broadcastItems();
-      } catch (error) {
-        console.log(error);
-        fetchFailedCallback(self, error);
-      }
-    })();
+  /**
+   *
+   * @param {int} count
+   */
+  const update_route_progress = function (count) {
+    // There is nothing to do here
+    console.log(count);
+  }
+
+  const fetchBusStop = function () {
+    const stop = stopID !== null ? new Stop(stopID, null, null) : null;
+    StopRoute.get(stop,
+      update_common_route_list,
+      update_route_progress);
   };
 
   /* public methods */
@@ -84,10 +80,6 @@ var BusStopFetcher = function (stopID) {
 
   this.onError = function (callback) {
     fetchFailedCallback = callback;
-  };
-
-  this.url = function () {
-    return url;
   };
 
   this.stopID = function () {

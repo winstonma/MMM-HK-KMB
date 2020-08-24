@@ -9,7 +9,6 @@ const NodeHelper = require("node_helper");
 const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
-const BusRouteFetcher = require("./busroutefetcher.js");
 
 const got = require('got');
 
@@ -68,7 +67,7 @@ module.exports = NodeHelper.create({
         });
         this.sendSocketNotification("KMBETA" + stopID, JSON.parse(body));
       } catch (error) {
-        console.log("Error getting tram connections " + response.statusCode);
+        console.log("Error getting ETA connections " + response.statusCode);
       }
     })();
   },
@@ -86,12 +85,13 @@ module.exports = NodeHelper.create({
       console.log("Create new stop fetcher for stopID: " + stopID);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
-        const routeList = fetcher.item().data.map((route) => route.trim());
-        routeList.map((route) => self.createRouteFetcher(route, stopID));
+        for (const [key, stop] of Object.entries(fetcher.item())) {
+          self.createETAFetcher(stopID, stop[0]);
+        }
       });
       fetcher.onError(function (fetcher, error) {
         self.sendSocketNotification("FETCH_ERROR", {
-          url: fetcher.url(),
+          stopID: fetcher.stopID(),
           error: error
         });
       });
@@ -115,16 +115,16 @@ module.exports = NodeHelper.create({
    *
    * @param {stopInfo} the stop info (an object)
    */
-  createETAFetcher: function (stopInfo, stopID) {
+  createETAFetcher: function (stopID, stop) {
     const self = this;
 
     const reloadInterval = 60 * 1000;
-    let fetcher = new ETAFetcher(stopInfo, reloadInterval);
+    let fetcher = new ETAFetcher(stop, reloadInterval);
 
-    const fetcherKey = stopInfo.Route + stopInfo.Bound + stopInfo.ServiceType + stopInfo.Seq;
+    const fetcherKey = JSON.stringify(stop.variant);
 
     if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
-      console.log("Create new ETA fetcher for route: " + stopInfo.Route + " - Interval: " + reloadInterval);
+      console.log("Create new ETA fetcher for route: " + stop.variant.route.number + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
       });
@@ -137,69 +137,10 @@ module.exports = NodeHelper.create({
 
       this.stopFetchers[stopID]["etaFetchers"][fetcherKey] = fetcher;
     } else {
-      console.log("Use existing ETA fetcher for route: " + stopInfo.Route);
+      console.log("Use existing ETA fetcher for route: " + stop.variant.route.number);
       fetcher = this.stopFetchers[stopID]["etaFetchers"][fetcherKey];
       fetcher.broadcastItems();
     }
-    fetcher.startFetch();
-  },
-
-  /* createRouteFetcher(route, stopID, stopName)
-   * Creates a fetcher for obtaining the route info
-   *
-   * attribute route string - The route number
-   * attribute stopID string - Bus Stop ID
-   * attribute stopName string - Bus Stop Name
-   */
-  createRouteFetcher: function (route, stopID) {
-    var self = this;
-    var fetcher;
-    fetcher = new BusRouteFetcher(route, stopID);
-
-    // Find the stop name
-    const stopInfo = self.AllStopsInfo.filter((stop) => stop.BSICode === stopID)[0];
-    const stopName = stopInfo.CName;
-
-    fetcher.onReceive(function (fetcher) {
-      // Keep relevant bounds and find the stop name
-      fetcher.items().filter((routeInfo) => {
-        // Finding the matching stops from the bus route
-        let match = routeInfo.routeStops.filter((stop) => {
-          // It should not happen
-          if (stopName === '')
-            return false;
-
-          return (stop.BSICode.split("-")[0] === stopID.split("-")[0] &&
-            stop.BSICode.split("-")[1] === stopID.split("-")[1] &&
-            stop.CName == stopName
-          );
-        });
-
-        if (match.length > 1) {
-          // If there are more than 1 stops, then we need exact BSI-Code match
-          match = match.filter((stop) => {
-            return (stop.BSICode === stopID);
-          });
-        }
-
-        switch (match.length) {
-          case 0:
-            break;
-          default:
-            match.map((info) => {
-              info.basicInfo = routeInfo.basicInfo;
-              self.createETAFetcher(info, stopID);
-            });
-            break;
-        }
-      });
-    });
-    fetcher.onError(function (fetcher, error) {
-      self.sendSocketNotification("FETCH_ERROR", {
-        url: fetcher.url(),
-        error: error
-      });
-    });
     fetcher.startFetch();
   },
 
@@ -213,8 +154,8 @@ module.exports = NodeHelper.create({
 
     for (const [stopID, stopFetcher] of Object.entries(this.stopFetchers)) {
       let etas = [];
-      for (const [url, etaFetcher] of Object.entries(stopFetcher['etaFetchers'])) {
-        if (etaFetcher.items() != null) {
+      for (const [etcherKey, etaFetcher] of Object.entries(stopFetcher['etaFetchers'])) {
+        if (etaFetcher.items().length != 0) {
           etas.push(etaFetcher.items());
         }
       }

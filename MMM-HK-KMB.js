@@ -75,7 +75,8 @@ Module.register("MMM-HK-KMB", {
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
       let data = {};
-      // Filter ETA items
+
+      // Filter ETA items belongs to this module
       const stopList = this.config.stops.map(item => Object.values(item)[0]);
       const filteredData = Object.keys(payload)
         .filter(key => stopList.includes(key))
@@ -88,17 +89,17 @@ Module.register("MMM-HK-KMB", {
 
       for (const [stopID, stopInfo] of Object.entries(filteredData)) {
         const sortedETAs = stopInfo.etas.sort(function (a, b) {
-          if (a.stopInfo.Seq != b.stopInfo.Seq) {
-            if (a.stopInfo.Seq === "999")
+          if (a[0].stopRoute.stop.sequence != b[0].stopRoute.stop.sequence) {
+            if (a[0].stopRoute.stop.sequence === "999")
               return 1;
-            if (b.stopInfo.Seq === "999")
+            if (b[0].stopRoute.stop.sequence === "999")
               return -1;
           }
-          if (a.stopInfo.BSICode > b.stopInfo.BSICode)
+          if (a[0].stopRoute.stop.id > b[0].stopRoute.stop.id)
             return -1;
-          if (a.stopInfo.BSICode < b.stopInfo.BSICode)
+          if (a[0].stopRoute.stop.id < b[0].stopRoute.stop.id)
             return 1;
-          if (a.stopInfo.Route < b.stopInfo.Route)
+          if (a[0].stopRoute.variant.route.number < b[0].stopRoute.variant.route.number)
             return -1;
           return 1;
         });
@@ -137,12 +138,7 @@ Module.register("MMM-HK-KMB", {
 
       table.appendChild(this.createSpacerRow());
 
-      let nonActiveRoute = [];
-      let activeRoute = [];
-
-      [nonActiveRoute, activeRoute] = this.partition(stopInfo.etas, (e) => e.hasOwnProperty('eta') && this.containsAny(e.eta.eta[0].t, NOBUSINDICATORLIST));
-
-      activeRoute.map((etaObj) => {
+      stopInfo.etas.map((etaObj) => {
         data = this.createDataRow(etaObj);
         if (data != null)
           table.appendChild(data);
@@ -157,12 +153,6 @@ Module.register("MMM-HK-KMB", {
     }
 
     return wrapper;
-  },
-
-  partition: function (array, isValid) {
-    return array.reduce(([pass, fail], elem) => {
-      return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
-    }, [[], []]);
   },
 
   createLabelRow: function () {
@@ -247,27 +237,26 @@ Module.register("MMM-HK-KMB", {
 
     let line = document.createElement("td");
     line.className = "line";
-    line.innerHTML = routeObj.stopInfo.Route;
+    line.innerHTML = routeObj[0].stopRoute.variant.route.number;
     row.appendChild(line);
 
     let destination = document.createElement("td");
     destination.className = "destination";
-    destination.innerHTML = routeObj.stopInfo.basicInfo.DestCName;
+    destination.innerHTML = routeObj[0].stopRoute.variant.destination;
     row.appendChild(destination);
 
-    etaInfo = routeObj;
-    if (etaInfo.hasOwnProperty('eta')) {
-      let departure = document.createElement("td");
-      departure.className = "departure";
-      etaArray = [];
-      etaInfo.eta.eta.map((etaInfoItem) => {
-        const etaStr = etaInfoItem.t;
-        const eta = this.replaceAll(etaStr, BUSLINELOOKUP).replace(/\s/g, '');
-        etaArray.push(eta);
-      });
-      departure.innerHTML = etaArray.toString();
-      row.appendChild(departure);
-    }
+    let departure = document.createElement("td");
+    departure.className = "departure";
+    etaArray = [];
+    routeObj.map((etaInfoItem) => {
+      console.log(etaInfoItem);
+      const etaStr = etaInfoItem.time.split(/(.+):/)[1].split(/T/)[1];
+      const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
+      etaArray.push(etaStr+remarkStr);
+    });
+    departure.innerHTML = etaArray.toString();
+    row.appendChild(departure);
+
     return row;
   },
 

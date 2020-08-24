@@ -7,9 +7,7 @@
 
 const got = require('got');
 const querystring = require('querystring');
-const Secret = require('./secret.js');
-
-const etaUrl = "https://etav3.kmb.hk/?"
+const Eta = require('./scripts/Eta.js')
 
 /* ETAFetcher
 
@@ -19,7 +17,7 @@ const etaUrl = "https://etav3.kmb.hk/?"
  * attribute reloadInterval number - Reload interval in milliseconds.
  */
 
-var ETAFetcher = function (stopInfo, reloadInterval) {
+var ETAFetcher = function (stop, reloadInterval) {
   var self = this;
   reloadInterval = (reloadInterval < 1000) ? 1000 : reloadInterval;
 
@@ -41,52 +39,14 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
     reloadTimer = null;
     items = [];
 
-    const secret = Secret.getSecret(new Date().toISOString().split('.')[0] + 'Z');
-    let VENDOR_ID = '';
-    for (let i = 0; i < 16; ++i) {
-      VENDOR_ID += Math.floor(Math.random() * 16).toString(16);
-    }
-  
-    // Generate Url
-    const parseQueryString = {
-      action: "geteta",
-      lang: "tc",
-      route: stopInfo.Route,
-      bound: stopInfo.Bound,
-      service_type: stopInfo.ServiceType,
-      stop_seq: stopInfo.Seq,
-      vendor_id: VENDOR_ID,
-      apiKey: secret.apiKey,
-      ctr: secret.ctr
-    };
-
-    url = etaUrl + querystring.stringify(parseQueryString);
-
-    (async () => {
-      try {
-        const { body } = await got(url, {
-          responseType: 'json',
-          https: {
-            rejectUnauthorized: false
-          }
-        });
-        let item = {
-          eta: body[0],
-          stopInfo: stopInfo
-        };
-        items.push(item);
-        //body.stopInfo = stopInfo;
-        //items.push(body);
+    Eta.get(
+      stop
+      , function (/** Array */ etas) {
+        items = etas;
         self.broadcastItems();
         scheduleTimer();
-      } catch (error) {
-        // Suppress the error message
-        //console.log("Got error for ETA url: " + url);
-        //console.log(error);
-        fetchFailedCallback(self, error);
-        scheduleTimer();
       }
-    })();
+    );
   };
 
 	/* scheduleTimer()
@@ -149,7 +109,7 @@ var ETAFetcher = function (stopInfo, reloadInterval) {
   }
 
   this.items = function () {
-    return items[0];
+    return items;
   };
 };
 
