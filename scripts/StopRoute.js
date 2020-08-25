@@ -44,25 +44,25 @@ StopRoute.get = function (stop, callback, update_count) {
                 }
             };
             json.data.map(item => item.trim())
-                .forEach(
+                .map(
                     function (/** String */ route) {
                         // loop through each route and bound
                         Route.getBounds(
                             route
                             , function (/** int[] */ data) {
                                 let remaining_bounds = data.length;
-                                data.forEach(
+                                data.map(
                                     function (bound) {
                                         Variant.get(
                                             new Route(route, bound)
                                             , function (variants) {
                                                 let remaining_variants = variants.length;
-                                                variants.forEach(
+                                                variants.map(
                                                     function (variant) {
                                                         Stop.get(
                                                             variant
                                                             , function (stops) {
-                                                                stops.forEach(
+                                                                stops.map(
                                                                     function (inner_stop) {
                                                                         if (
                                                                             inner_stop.id === stop.id || (
