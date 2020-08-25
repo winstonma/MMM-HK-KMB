@@ -22,8 +22,8 @@ class StopRoute {
 StopRoute.get = function (stop, callback, update_count) {
     Common.callApi(
         {
-            action : 'getRoutesInStop',
-            bsiCode : stop.id
+            action: 'getRoutesInStop',
+            bsiCode: stop.id
         }
         /**
          * @param {array<string>} json.data
@@ -44,25 +44,25 @@ StopRoute.get = function (stop, callback, update_count) {
                 }
             };
             json.data.map(item => item.trim())
-                .map(
+                .forEach(
                     function (/** String */ route) {
                         // loop through each route and bound
                         Route.getBounds(
                             route
                             , function (/** int[] */ data) {
                                 let remaining_bounds = data.length;
-                                data.map(
+                                data.forEach(
                                     function (bound) {
                                         Variant.get(
                                             new Route(route, bound)
                                             , function (variants) {
                                                 let remaining_variants = variants.length;
-                                                variants.map(
+                                                variants.forEach(
                                                     function (variant) {
                                                         Stop.get(
                                                             variant
                                                             , function (stops) {
-                                                                stops.map(
+                                                                stops.forEach(
                                                                     function (inner_stop) {
                                                                         if (
                                                                             inner_stop.id === stop.id || (
