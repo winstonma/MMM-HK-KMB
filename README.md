@@ -84,12 +84,11 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
     ...
 
 ## Find the `stopID`
-1. Open your web browser and navigate to the [USHB KMB Search Page](https://search.ushb.net/bus/KMB).
-2. Enter the KMB Bus route number that passes the stop. Then the route info would be displayed.
-3. At the top of the page, pick the desired `路線方向`
-4. Go to the bus stop list and click on your bus stop
-5. At the map, click on `車站資料`. A new page would be displayed.
-6. When a new page is being displayed, check the link (e.g. https://search.ushb.net/bus/stop/TS26-T-1000-0). Note the last portion of the link (e.g. HO06-S-1250-0)is the `StopID` you are looking for.
+1. Open your web browser and navigate to the [kmb-lwb-combined-headway-eta](http://kmb_eta.csproject.org/) page, developed by miklcct.
+2. In the `Enter the route number:` box, enter the KMB Bus route number that passes the stop. Then press the submit button. The destination and the home would be displayed.
+3. After the submit of bus route, the route origin and destination would be displayed. Choose the right diretcion by clicking `Switch direction` button.
+4. In the `Choose a route variant:` infobox, select the variant.
+5. In the `Choose a stop in the list:` infobox, there is a list of stop with the `stopID` displayed in bracket. Fill the `stopID` in the `config.js`.
 
 ## Config Options
 | **Option** | **Default** | **Description** |
@@ -98,25 +97,6 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 | labelRow<BR>`optional` | true | <BR> Show or hide column headers<BR> <EM>Possible values: true, false</EM><P> |
 | reload<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
 
-## Licence
-MIT License
-
-Copyright (c) 2016 Winston (https://github.com/winstonma/)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Acknowledgement
+This project is possible only when given the code [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta), which is developed by miklcct.
+Last but not least, I would like to dedicate my thanks to AlvinHKH, who implement working Android implementation [BusETA](https://github.com/alvinhkh/buseta).
