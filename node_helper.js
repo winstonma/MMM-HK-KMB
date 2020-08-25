@@ -18,36 +18,6 @@ module.exports = NodeHelper.create({
     console.log("Starting node helper for: " + this.name);
     // Fetchers for all stops
     this.stopFetchers = [];
-    // All Stops info
-    this.AllStopsInfo;
-
-    this.getStopsInfo();
-  },
-
-  /*
-   * Obtain the info of all bus stops
-   */
-  getStopsInfo: async function () {
-    const self = this;
-
-    const routeStopCheckUrl = "https://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx?";
-
-    const parseQueryString = {
-      action: "getallstops"
-    };
-
-    (async () => {
-      try {
-        const { body } = await got.post(routeStopCheckUrl, {
-          searchParams: parseQueryString,
-          responseType: 'json'
-        });
-        this.AllStopsInfo = body.data.stops;
-      } catch (error) {
-        console.log("Error obtaining BusRoute connections: " + error);
-        this.AllStopsInfo = [];
-      }
-    })();
   },
 
   socketNotificationReceived: function (notification, payload) {
@@ -95,12 +65,8 @@ module.exports = NodeHelper.create({
           error: error
         });
       });
-      const stopInfo = this.AllStopsInfo.filter((stopInfo) => {
-        return (stopID.includes(stopInfo.BSICode));
-      })[0];
       self.stopFetchers[stopID] = {
         Fetcher: fetcher,
-        stopInfo: stopInfo,
         etaFetchers: {}
       };
     } else {
@@ -113,7 +79,8 @@ module.exports = NodeHelper.create({
 
   /* Creates a fetcher for collecting ETA info
    *
-   * @param {stopInfo} the stop info (an object)
+   * @param {stopID} the stop ID (a string)
+   * @param {stop} the stop info (an object)
    */
   createETAFetcher: function (stopID, stop) {
     const self = this;
@@ -160,7 +127,6 @@ module.exports = NodeHelper.create({
         }
       }
       stops[stopID] = {
-        stopInfo: stopFetcher["stopInfo"],
         etas: etas
       };
     }

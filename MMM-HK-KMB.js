@@ -126,7 +126,8 @@ Module.register("MMM-HK-KMB", {
       }
 
       let header = document.createElement("header");
-      header.innerHTML = (stopInfo.stopInfo != null) ? stopInfo.stopInfo.CName : this.config.stopName;
+      const stopName = stopInfo.etas[0][0].stopRoute.stop.name;
+      header.innerHTML = (stopName != null) ? stopName : this.config.stopName;
       wrapper.appendChild(header);
 
       // Start creating connections table

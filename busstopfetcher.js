@@ -44,8 +44,7 @@ var BusStopFetcher = function (stopID) {
    * @param {int} count
    */
   const update_route_progress = function (count) {
-    // There is nothing to do here
-    console.log(count);
+    // This API can print out the update count, but it is ignored here
   }
 
   const fetchBusStop = function () {
