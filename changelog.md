@@ -1,6 +1,10 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.4.1] - 2020-08-24
+* Improve the bus stop fetcher performance
+* The bus stop name is now fetched from the bus route
+
 ## [1.4.0] - 2020-08-24
 * Uses [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta) script to fetch the KMB related info
 
