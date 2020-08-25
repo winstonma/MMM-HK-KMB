@@ -35,7 +35,6 @@ var BusStopFetcher = function (stopID) {
 
   const update_common_route_list = function (/** Object<string, Array<StopRoute>> */ result) {
     item = result;
-    console.log("update_common_route_list");
     self.broadcastItems();
   }
 
