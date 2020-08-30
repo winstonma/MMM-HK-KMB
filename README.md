@@ -16,10 +16,10 @@ I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-m
 
 ## Current version
 
-v1.4.1
+v1.4.2
 
 ## Languages
-As of version 1.0.0, MMM-HK-KMB features language support for `Chinese (zh)` and `English (en)` mirrors.
+As of version 1.4.2, MMM-HK-KMB features language support for `Traditional Chinese (zh-tw)`,  `Simplified Chinese (zh-cn)` and `English (en)`.
 
 ## Prerequisite
 A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
