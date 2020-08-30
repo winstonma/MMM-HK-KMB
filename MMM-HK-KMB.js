@@ -13,12 +13,6 @@ const BUSLINELOOKUP = {
   "預定班次": "*"
 };
 
-// No bus indicator
-const NOBUSINDICATORLIST = [
-  "暫時沒有預定班次",
-  "此路線只於"
-]
-
 Module.register("MMM-HK-KMB", {
 
   defaults: {
