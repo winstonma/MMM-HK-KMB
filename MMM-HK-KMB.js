@@ -30,7 +30,7 @@ Module.register("MMM-HK-KMB", {
     return {
       "de": "translations/de.json",
       "en": "translations/en.json",
-      "zh": "translations/zh.json"
+      "zh-tw": "translations/zh-tw.json"
     };
   },
 

@@ -62,8 +62,9 @@ const Common = {
      */
     getLanguage() {
         //return $('html').attr('lang');
-        const lang = ['en', 'zh-hans', 'zh-hant'];
-        return lang.includes(config.language) ? config.language : 'en';
+        if (config.language === 'zh-tw') return 'zh-hant';
+        if (config.language === 'zh-cn') return 'zh-hans';
+        return 'en';
     },
 
     secret : null,
