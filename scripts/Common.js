@@ -4,7 +4,7 @@ const got = require('got');
 
 const Common = {
     PROXY_URL : 'https://miklcct.com/proxy/',
-    API_ENDPOINT : 'http://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx',
+    API_ENDPOINT : 'https://search.kmb.hk/KMBWebSite/Function/FunctionRequest.ashx',
 
     /**
      * Call the KMB API
@@ -13,7 +13,7 @@ const Common = {
      * @param {function(object)} callback The handler for the returned JSON
      */
     callApi : function (query, callback) {
-       //$.get((location.protocol === 'https:' ? Common.PROXY_URL : '') + Common.API_ENDPOINT, query, callback);
+       //$.get(Common.API_ENDPOINT, query, callback);
        (async () => {
         try {
           const { body } = await got(Common.API_ENDPOINT, {
