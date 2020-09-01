@@ -10,8 +10,6 @@ const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
 
-const got = require('got');
-
 module.exports = NodeHelper.create({
 
   start: function () {
@@ -27,19 +25,6 @@ module.exports = NodeHelper.create({
         this.getStopInfo(item.stopID)
       });
     }
-  },
-
-  getData: function (options, stopID) {
-    (async () => {
-      try {
-        const { body } = await got(options, {
-          responseType: 'json'
-        });
-        this.sendSocketNotification("KMBETA" + stopID, JSON.parse(body));
-      } catch (error) {
-        console.log("Error getting ETA connections " + response.statusCode);
-      }
-    })();
   },
 
   /*
