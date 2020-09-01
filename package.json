@@ -14,8 +14,8 @@
     "public transport",
     "local transit"
   ],
-  "author": "Winston",
-  "license": "MIT",
+  "author": "Winston Ma",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/winstonma/MMM-HK-KMB/issues"
   },
