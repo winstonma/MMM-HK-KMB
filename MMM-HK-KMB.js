@@ -120,7 +120,7 @@ Module.register("MMM-HK-KMB", {
       }
 
       let header = document.createElement("header");
-      const stopName = stopInfo.etas[0][0].stopRoute.stop.name;
+      const stopName = stopInfo.etas ? "" : stopInfo.etas[0][0].stopRoute.stop.name;
       header.innerHTML = (stopName != null) ? stopName : this.config.stopName;
       wrapper.appendChild(header);
 
@@ -258,7 +258,7 @@ Module.register("MMM-HK-KMB", {
     const re = new RegExp(Object.keys(mapObj).join("|"), "gi");
 
     return str.replace(re, function (matched) {
-      return mapObj[matched.toLowerCase()];
+      return mapObj[matched];
     });
   },
 
