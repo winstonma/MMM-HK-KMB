@@ -26,6 +26,11 @@ Module.register("MMM-HK-KMB", {
     reloadInterval: 1 * 60 * 1000, // every 1 minute
   },
 
+  // Define required scripts.
+  getScripts: function () {
+    return ["moment.js"];
+  },
+
   getTranslations: function () {
     return {
       "en": "translations/en.json",
@@ -247,7 +252,7 @@ Module.register("MMM-HK-KMB", {
       const timeFormat = (config.timeFormat != 24) ? "hh:mm" : "HH:mm";
       const etaStr = moment(etaInfoItem.time, 'HH:mm').format(timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
-      etaArray.push(etaStr+remarkStr);
+      etaArray.push(etaStr + remarkStr);
     });
     departure.innerHTML = etaArray.toString();
     row.appendChild(departure);
