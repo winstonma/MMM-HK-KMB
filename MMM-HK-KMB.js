@@ -14,7 +14,7 @@ const BUSLINELOOKUP = {
 };
 
 Module.register("MMM-HK-KMB", {
-
+  // Default module config.
   defaults: {
     stops: [
       {
@@ -51,23 +51,20 @@ Module.register("MMM-HK-KMB", {
     this.etaItems = {};
     this.activeItem = 0;
 
-    this.sendSocketNotification("ADD_STOPS", {
-      config: this.config.stops
-    });
-
-    //this.registerETAs();
+    this.registerStops();
   },
 
-  /* registerETAs()
-   * registers the feeds to be used by the backend.
+  /* registerStops()
+   * registers the stops to be used by the backend.
    */
-  registerETAs: function () {
-    this.config.ETAs.map((eta) => {
-      this.sendSocketNotification("ADD_ETA", {
-        feed: eta,
+  registerStops: function () {
+    for (var f in this.config.stops) {
+      var stop = this.config.stops[f];
+      this.sendSocketNotification("ADD_STOP", {
+        stop: stop,
         config: this.config
       });
-    });
+    }
   },
 
 

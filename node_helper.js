@@ -20,19 +20,18 @@ module.exports = NodeHelper.create({
 
   socketNotificationReceived: function (notification, payload) {
     // Request for information
-    if (notification === "ADD_STOPS") {
-      payload.config.map((item) => {
-        this.getStopInfo(item.stopID)
-      });
-    }
+    if (notification === "ADD_STOP") {
+			this.getStopInfo(payload.stop.stopID, payload.config);
+		}
   },
 
-  /*
+  /* getStopInfo(stopID, config)
    * Obtain the route that pass through this bus stop
    *
-   * @param {stopID} the stop ID of the bus stop
+	 * attribute stopID string - The stopID of the bus stop
+	 * attribute config object - A configuration object containing reload interval in milliseconds.
    */
-  getStopInfo: function (stopID) {
+  getStopInfo: function (stopID, config) {
     let self = this;
     let fetcher;
 
