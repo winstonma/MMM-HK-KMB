@@ -28,8 +28,8 @@ Module.register("MMM-HK-KMB", {
 
   getTranslations: function () {
     return {
-      "de": "translations/de.json",
       "en": "translations/en.json",
+      "de": "translations/de.json",
       "zh-tw": "translations/zh-tw.json"
     };
   },
