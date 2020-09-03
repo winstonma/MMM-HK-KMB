@@ -244,7 +244,8 @@ Module.register("MMM-HK-KMB", {
     departure.className = "departure";
     etaArray = [];
     routeObj.map((etaInfoItem) => {
-      const etaStr = etaInfoItem.time;
+      const timeFormat = (config.timeFormat != 24) ? "hh:mm" : "HH:mm";
+      const etaStr = moment(etaInfoItem.time, 'HH:mm').format(timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
       etaArray.push(etaStr+remarkStr);
     });
