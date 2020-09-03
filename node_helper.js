@@ -9,11 +9,12 @@ const NodeHelper = require("node_helper");
 const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
+const Log = require("../../js/logger");
 
 module.exports = NodeHelper.create({
 
   start: function () {
-    console.log("Starting node helper for: " + this.name);
+    Log.log("Starting node helper for: " + this.name);
     // Fetchers for all stops
     this.stopFetchers = [];
   },
@@ -36,7 +37,7 @@ module.exports = NodeHelper.create({
     let fetcher;
 
     if (typeof self.stopFetchers[stopID] === "undefined") {
-      console.log("Create new stop fetcher for stopID: " + stopID);
+      Log.log("Create new stop fetcher for stopID: " + stopID);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
         for (const [key, stop] of Object.entries(fetcher.item())) {
@@ -54,7 +55,7 @@ module.exports = NodeHelper.create({
         etaFetchers: {}
       };
     } else {
-      console.log("Use existing Stop fetcher for stopID: " + stopID);
+      Log.log("Use existing Stop fetcher for stopID: " + stopID);
       fetcher = self.stopFetchers[stopID]["Fetcher"];
       fetcher.broadcastItems();
     }
@@ -75,7 +76,7 @@ module.exports = NodeHelper.create({
     const fetcherKey = JSON.stringify(stop.variant);
 
     if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
-      console.log("Create new ETA fetcher for route: " + stop.variant.route.number + " - Interval: " + reloadInterval);
+      Log.log("Create new ETA fetcher for route: " + stop.variant.route.number + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
       });
@@ -88,7 +89,7 @@ module.exports = NodeHelper.create({
 
       this.stopFetchers[stopID]["etaFetchers"][fetcherKey] = fetcher;
     } else {
-      console.log("Use existing ETA fetcher for route: " + stop.variant.route.number);
+      Log.log("Use existing ETA fetcher for route: " + stop.variant.route.number);
       fetcher = this.stopFetchers[stopID]["etaFetchers"][fetcherKey];
       fetcher.broadcastItems();
     }
