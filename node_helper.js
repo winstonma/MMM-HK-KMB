@@ -6,7 +6,6 @@
  */
 
 const NodeHelper = require("node_helper");
-const validUrl = require("valid-url");
 const ETAFetcher = require("./etafetcher.js");
 const BusStopFetcher = require("./busstopfetcher.js");
 const Log = require("../../js/logger");
