@@ -263,22 +263,11 @@ Module.register("MMM-HK-KMB", {
     });
   },
 
-  containsAny: function (str, items) {
-    for (let i in items) {
-      let item = items[i];
-      if (str.indexOf(item) > -1) {
-        return true;
-      }
-    }
-    return false;
-  },
-
   chunkArrayInGroups: function (arr, size) {
     let myArray = [];
     for (let i = 0; i < arr.length; i += size) {
       myArray.push(arr.slice(i, i + size));
     }
     return myArray;
-  },
-
+  }
 });
