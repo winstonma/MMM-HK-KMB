@@ -21,6 +21,7 @@ Module.register("MMM-HK-KMB", {
         stopID: 'HO06-S-1250-0',
       }
     ],
+    timeFormat: (config.timeFormat !== 24) ? "h:mm" : "HH:mm",
     inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
     labelRow: true,
     reloadInterval: 1 * 60 * 1000, // every 1 minute
@@ -66,7 +67,6 @@ Module.register("MMM-HK-KMB", {
       });
     }
   },
-
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
@@ -245,8 +245,7 @@ Module.register("MMM-HK-KMB", {
     departure.className = "departure";
     etaArray = [];
     routeObj.map((etaInfoItem) => {
-      const timeFormat = (config.timeFormat != 24) ? "hh:mm" : "HH:mm";
-      const etaStr = moment(etaInfoItem.time, 'HH:mm').format(timeFormat);
+      const etaStr = moment(etaInfoItem.time, 'HH:mm').format(this.config.timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
       etaArray.push(etaStr + remarkStr);
     });
