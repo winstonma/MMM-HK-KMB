@@ -7,6 +7,12 @@
 
 // String replacer
 const BUSLINELOOKUP = {
+  //en
+  "KMB": "<sup>K</sup>",
+  "CTB": "<sup>C</sup>",
+  "NWFB": "<sup>N</sup>",
+  "Scheduled": "*",
+  // zh-tw
   "新巴": "<sup>新</sup>",
   "九巴": "<sup>九</sup>",
   "城巴": "<sup>城</sup>",
