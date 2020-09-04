@@ -16,7 +16,9 @@ const BUSLINELOOKUP = {
   "新巴": "<sup>新</sup>",
   "九巴": "<sup>九</sup>",
   "城巴": "<sup>城</sup>",
-  "預定班次": "*"
+  "預定班次": "*",
+  // zh-cn
+  "预定班次": "*"
 };
 
 Module.register("MMM-HK-KMB", {
@@ -42,6 +44,7 @@ Module.register("MMM-HK-KMB", {
     return {
       "en": "translations/en.json",
       "de": "translations/de.json",
+      "zh-cn": "translations/zh-cn.json",
       "zh-tw": "translations/zh-tw.json"
     };
   },

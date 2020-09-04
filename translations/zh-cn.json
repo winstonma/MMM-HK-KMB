@@ -1,0 +1,12 @@
+{
+  "LINE": "路线",
+  "DESTINATION": "目的地",
+  "DEPARTURE": "预计到达时间",
+  "NOW": "现在",
+  "TIME": "",
+  "NO-TRAMS": "没有数据",
+  "MINUTE": "分钟",
+  "MINUTES": "分钟",
+  "EVERY": "每",
+  "INACTIVE": "<sup>不活跃</sup>"
+}
