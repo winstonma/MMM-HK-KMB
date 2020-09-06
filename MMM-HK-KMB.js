@@ -45,7 +45,8 @@ Module.register("MMM-HK-KMB", {
       "en": "translations/en.json",
       "de": "translations/de.json",
       "zh-cn": "translations/zh-cn.json",
-      "zh-tw": "translations/zh-tw.json"
+      "zh-tw": "translations/zh-tw.json",
+      "zh-hk": "translations/zh-tw.json"
     };
   },
 

@@ -18,7 +18,7 @@ Here is the screenshots with different language settings:
 
     ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_en.png)
 
-* `zh-tw`
+* `zh-tw` and `zh-hk`
 
     ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-tw.png)
 
@@ -32,7 +32,7 @@ Here is the screenshots with different language settings:
 v1.4.2
 
 ## Languages
-As of version 1.4.2, MMM-HK-KMB features language support for `Traditional Chinese (zh-tw)`,  `Simplified Chinese (zh-cn)` and `English (en)`.
+As of version 1.4.2, MMM-HK-KMB features language support for `Traditional Chinese (zh-tw and zh-hk)`,  `Simplified Chinese (zh-cn)` and `English (en)`.
 
 ## Prerequisite
 A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
