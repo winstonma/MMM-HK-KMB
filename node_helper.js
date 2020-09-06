@@ -40,6 +40,10 @@ module.exports = NodeHelper.create({
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
         for (const [key, stop] of Object.entries(fetcher.item())) {
+          // Find the stop info
+          if (!('stopInfo' in self.stopFetchers[stopID]) && (stop[0].stop.id === stopID)) {
+            self.stopFetchers[stopID].stopInfo = stop[0].stop;
+          }
           self.createETAFetcher(stopID, stop[0]);
         }
       });
@@ -111,7 +115,8 @@ module.exports = NodeHelper.create({
         }
       }
       stops[stopID] = {
-        etas: etas
+        etas: etas,
+        stopInfo: this.stopFetchers[stopID].stopInfo
       };
     }
     this.sendSocketNotification("ETA_ITEMS", stops);

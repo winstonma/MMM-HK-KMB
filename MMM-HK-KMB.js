@@ -131,7 +131,7 @@ Module.register("MMM-HK-KMB", {
       }
 
       let header = document.createElement("header");
-      header.innerHTML = stopInfo.etas?.[0]?.[0]?.stopRoute.stop.name ?? this.config.stopName;
+      header.innerHTML = this.config.stopName ?? stopInfo.stopInfo.name;
       wrapper.appendChild(header);
 
       // Start creating connections table
