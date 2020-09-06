@@ -1,9 +1,9 @@
 # MMM-HK-KMB
-<B>Station monitor</B> for the <B>Hong Kong KMB</B>.<P>
+**Station monitor** for the **Hong Kong KMB**.
 
-This module is an extension of the amazing [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror) project by [MichMich](https://github.com/MichMich/) which has inspired me to share my coding skills with others as well. Check it out, you know you want to :). <P>
+This module is an extension of the amazing [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror) project by [MichMich](https://github.com/MichMich/) which has inspired me to share my coding skills with others as well. Check it out, you know you want to :).
 
-It's always nice to see mirrors using my work, so feel free to send me some screenshots of your implementations.<P>
+It's always nice to see mirrors using my work, so feel free to send me some screenshots of your implementations.
 
 Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</sup> Forum](http://forum.magicmirror.builders/)?
 
@@ -12,7 +12,20 @@ I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-m
 
 ## Screenshots
 
-![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh.png)
+Here is the screenshots with different language settings:
+
+* `en`
+
+    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_en.png)
+
+* `zh-tw`
+
+    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-tw.png)
+
+* `zh-cn`
+
+    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-cn.png)
+
 
 ## Current version
 
