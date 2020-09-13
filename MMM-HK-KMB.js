@@ -132,7 +132,7 @@ Module.register("MMM-HK-KMB", {
       }
 
       let header = document.createElement("header");
-      header.innerHTML = this.config.stopName ?? stopInfo.stopInfo.name;
+      header.innerHTML = this.config.stopName ?? stopInfo.stopInfo?.name;
       wrapper.appendChild(header);
 
       // Start creating connections table
