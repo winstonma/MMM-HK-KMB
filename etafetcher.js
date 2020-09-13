@@ -37,7 +37,6 @@ var ETAFetcher = function (stop, reloadInterval) {
   var fetchETA = function () {
     clearTimeout(reloadTimer);
     reloadTimer = null;
-    items = [];
 
     Eta.get(
       stop
