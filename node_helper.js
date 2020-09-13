@@ -32,7 +32,7 @@ module.exports = NodeHelper.create({
 	 * attribute config object - A configuration object containing reload interval in milliseconds.
    */
   getStopInfo: function (stopID, config) {
-    let self = this;
+    const self = this;
     let fetcher;
 
     if (typeof self.stopFetchers[stopID] === "undefined") {
@@ -78,7 +78,7 @@ module.exports = NodeHelper.create({
 
     const fetcherKey = JSON.stringify(stop.variant);
 
-    if (!Object.keys(this.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
+    if (!Object.keys(self.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
       Log.log("Create new ETA fetcher for route: " + stop.variant.route.number + " - Interval: " + reloadInterval);
       fetcher.onReceive(function (fetcher) {
         self.broadcastETAs();
@@ -90,10 +90,10 @@ module.exports = NodeHelper.create({
         });
       });
 
-      this.stopFetchers[stopID]["etaFetchers"][fetcherKey] = fetcher;
+      self.stopFetchers[stopID]["etaFetchers"][fetcherKey] = fetcher;
     } else {
       Log.log("Use existing ETA fetcher for route: " + stop.variant.route.number);
-      fetcher = this.stopFetchers[stopID]["etaFetchers"][fetcherKey];
+      fetcher = self.stopFetchers[stopID]["etaFetchers"][fetcherKey];
       fetcher.broadcastItems();
     }
     fetcher.startFetch();
@@ -107,7 +107,7 @@ module.exports = NodeHelper.create({
     const self = this;
     let stops = {};
 
-    for (const [stopID, stopFetcher] of Object.entries(this.stopFetchers)) {
+    for (const [stopID, stopFetcher] of Object.entries(self.stopFetchers)) {
       let etas = [];
       for (const [etcherKey, etaFetcher] of Object.entries(stopFetcher['etaFetchers'])) {
         if (etaFetcher.items().length != 0) {
@@ -116,9 +116,9 @@ module.exports = NodeHelper.create({
       }
       stops[stopID] = {
         etas: etas,
-        stopInfo: this.stopFetchers[stopID].stopInfo
+        stopInfo: self.stopFetchers[stopID].stopInfo
       };
     }
-    this.sendSocketNotification("ETA_ITEMS", stops);
+    self.sendSocketNotification("ETA_ITEMS", stops);
   },
 });
