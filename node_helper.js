@@ -21,15 +21,15 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (notification, payload) {
     // Request for information
     if (notification === "ADD_STOP") {
-			this.getStopInfo(payload.stop.stopID, payload.config);
-		}
+      this.getStopInfo(payload.stop.stopID, payload.config);
+    }
   },
 
   /* getStopInfo(stopID, config)
    * Obtain the route that pass through this bus stop
    *
-	 * attribute stopID string - The stopID of the bus stop
-	 * attribute config object - A configuration object containing reload interval in milliseconds.
+   * attribute stopID string - The stopID of the bus stop
+   * attribute config object - A configuration object containing reload interval in milliseconds.
    */
   getStopInfo: function (stopID, config) {
     const self = this;
@@ -39,6 +39,38 @@ module.exports = NodeHelper.create({
       Log.log("Create new stop fetcher for stopID: " + stopID);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
+        const stopInfoMap = new Map(Object.entries(fetcher.item()));
+
+        const stopInfoMapSorted = new Map([...stopInfoMap.entries()].sort((a, b) => {
+          const stopRouteA = a[1][0];
+          const stopRouteB = b[1][0];
+          if (stopRouteA.stop.sequence != stopRouteB.stop.sequence) {
+            if (stopRouteA.stop.sequence === "999")
+              return 1;
+            if (stopRouteB.stop.sequence === "999")
+              return -1;
+          }
+          if (stopRouteA.stop.id != stopRouteB.stop.id) {
+            return stopRouteA.stop.id > stopRouteB.stop.id ? 1 : -1;
+          }
+          if (stopRouteA.variant.route.number < stopRouteB.variant.route.number)
+            return -1;
+          return 1;
+        }));
+
+        const stopName = new Map(
+          [...stopInfoMapSorted]
+            .filter(([k, v]) => v[0].stop.id == stopID)
+        ).values().next().value[0].stop.name;
+
+        const stopInfoSorted = Array.from(stopInfoMapSorted).reduce((obj, [key, value]) => (
+          Object.assign(obj, { [key]: value })
+        ), {});
+        self.sendSocketNotification("STOP_ITEM", {
+          stopID: stopID,
+          stopName: stopName,
+          stopInfo: stopInfoSorted
+        });
         for (const [key, stop] of Object.entries(fetcher.item())) {
           // Find the stop info
           if (!('stopInfo' in self.stopFetchers[stopID]) && (stop[0].stop.id === stopID)) {

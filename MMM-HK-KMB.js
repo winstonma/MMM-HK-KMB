@@ -59,8 +59,7 @@ Module.register("MMM-HK-KMB", {
     Log.info("Starting module: " + this.name);
 
     // Collect the stop info (including the routes that the stop)
-    this.etaItems = {};
-    this.activeItem = 0;
+    this.stopInfo = {};
 
     this.registerStops();
   },
@@ -80,59 +79,39 @@ Module.register("MMM-HK-KMB", {
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
-      let data = {};
-
-      // Filter ETA items belongs to this module
-      const stopList = this.config.stops.map(item => Object.values(item)[0]);
-      const filteredData = Object.keys(payload)
-        .filter(key => stopList.includes(key))
-        .reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: payload[key]
-          };
-        }, {});
-
-      for (const [stopID, stopInfo] of Object.entries(filteredData)) {
-        const sortedETAs = stopInfo.etas.sort(function (a, b) {
-          if (a[0].stopRoute.stop.sequence != b[0].stopRoute.stop.sequence) {
-            if (a[0].stopRoute.stop.sequence === "999")
-              return 1;
-            if (b[0].stopRoute.stop.sequence === "999")
-              return -1;
+      for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
+        if (payload[stopID]?.etas) {
+          for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
+            routeInfo[0].etas = payload[stopID].etas.find(x => JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route));
           }
-          if (a[0].stopRoute.stop.id > b[0].stopRoute.stop.id)
-            return -1;
-          if (a[0].stopRoute.stop.id < b[0].stopRoute.stop.id)
-            return 1;
-          if (a[0].stopRoute.variant.route.number < b[0].stopRoute.variant.route.number)
-            return -1;
-          return 1;
-        });
-        stopInfo.etas = sortedETAs;
-        data[stopID] = stopInfo;
+        }
+        this.updateDom();
       }
-      this.etaItems = data;
-      this.updateDom();
+    } else if (notification === "STOP_ITEM") {
+      if (this.config.stops.find(element => element.stopID == payload.stopID) != undefined) {
+        this.stopInfo[payload.stopID] = payload;
+        this.updateDom();
+      }
+    } else if (notification === "FETCH_ERROR") {
+      Log.error("Calendar Error. Could not fetch calendar: " + payload.url);
+      this.loaded = true;
+    } else if (notification === "INCORRECT_URL") {
+      Log.error("Calendar Error. Incorrect url: " + payload.url);
     }
   },
 
   getDom: function () {
     let wrapper = document.createElement("div");
-    for (const [stopID, stopInfo] of Object.entries(this.etaItems)) {
-      if (this.activeItem >= stopInfo.etas.length) {
-        this.activeItem = 0;
-      }
 
-      // Actually it is a new redraw
-      if (stopInfo === null) {
-        wrapper.innerHTML = this.translate("LOADING");
-        wrapper.className = "small dimmed";
-        return wrapper;
-      }
+    if (Object.keys(this.stopInfo).length === 0) {
+      wrapper.innerHTML = this.translate("LOADING");
+      wrapper.className = this.config.tableClass + " dimmed";
+      return wrapper;
+    }
 
+    for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
       let header = document.createElement("header");
-      header.innerHTML = this.config.stopName ?? stopInfo.stopInfo?.name;
+      header.innerHTML = this.config.stopName ?? stopInfo.stopName;
       wrapper.appendChild(header);
 
       // Start creating connections table
@@ -144,11 +123,12 @@ Module.register("MMM-HK-KMB", {
 
       table.appendChild(this.createSpacerRow());
 
-      stopInfo.etas.map((etaObj) => {
-        data = this.createDataRow(etaObj);
-        if (data != null)
+      for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
+        if (routeInfo[0].etas) {
+          data = this.createDataRow(routeInfo);
           table.appendChild(data);
-      });
+        }
+      }
 
       if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
         table.appendChild(this.createSpacerRow());
@@ -243,18 +223,18 @@ Module.register("MMM-HK-KMB", {
 
     let line = document.createElement("td");
     line.className = "line";
-    line.innerHTML = routeObj[0].stopRoute.variant.route.number;
+    line.innerHTML = routeObj[0].variant.route.number;
     row.appendChild(line);
 
     let destination = document.createElement("td");
     destination.className = "destination";
-    destination.innerHTML = routeObj[0].stopRoute.variant.destination;
+    destination.innerHTML = routeObj[0].variant.destination;
     row.appendChild(destination);
 
     let departure = document.createElement("td");
     departure.className = "departure";
     etaArray = [];
-    routeObj.map((etaInfoItem) => {
+    routeObj[0].etas.map((etaInfoItem) => {
       const etaStr = moment(etaInfoItem.time, 'HH:mm').format(this.config.timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
       etaArray.push(etaStr + remarkStr);
