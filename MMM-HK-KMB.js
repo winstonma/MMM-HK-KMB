@@ -80,10 +80,10 @@ Module.register("MMM-HK-KMB", {
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
       for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
-        if (payload[stopID]?.etas) {
-          for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
-            routeInfo[0].etas = payload[stopID].etas.find(x => JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route));
-          }
+        if (payload[stopID]) {
+          Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
+            routeInfo[0].etas = payload[stopID].find(x => JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route));
+          });
         }
         this.updateDom();
       }
@@ -109,6 +109,34 @@ Module.register("MMM-HK-KMB", {
       return wrapper;
     }
 
+    Object.values(this.stopInfo).forEach((stopInfo) => {
+      let header = document.createElement("header");
+      header.innerHTML = this.config.stopName ?? stopInfo.stopName;
+      wrapper.appendChild(header);
+
+      // Start creating connections table
+      let table = document.createElement("table");
+      table.classList.add("small", "table");
+      table.border = '0';
+
+      table.appendChild(this.createLabelRow());
+
+      table.appendChild(this.createSpacerRow());
+
+      for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
+        if (routeInfo[0].etas) {
+          data = this.createDataRow(routeInfo);
+          table.appendChild(data);
+        }
+      }
+
+      if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
+        table.appendChild(this.createSpacerRow());
+        table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
+      }
+
+      wrapper.appendChild(table);
+    })
     for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
       let header = document.createElement("header");
       header.innerHTML = this.config.stopName ?? stopInfo.stopName;

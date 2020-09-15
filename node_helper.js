@@ -76,10 +76,6 @@ module.exports = NodeHelper.create({
 
         // Fetch the ETA for the stop
         for (const [key, stop] of Object.entries(stopInfoSorted)) {
-          // Find the stop info
-          if (!('stopInfo' in self.stopFetchers[stopID]) && (stop[0].stop.id === stopID)) {
-            self.stopFetchers[stopID].stopInfo = stop[0].stop;
-          }
           self.createETAFetcher(stopID, stop[0]);
         }
       });
@@ -150,10 +146,7 @@ module.exports = NodeHelper.create({
           etas.push(etaFetcher.items());
         }
       }
-      stops[stopID] = {
-        etas: etas,
-        stopInfo: self.stopFetchers[stopID].stopInfo
-      };
+      stops[stopID] = etas;
     }
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
