@@ -41,6 +41,7 @@ module.exports = NodeHelper.create({
       fetcher.onReceive(function (fetcher) {
         const stopInfoMap = new Map(Object.entries(fetcher.item()));
 
+        // Sort the map
         const stopInfoMapSorted = new Map([...stopInfoMap.entries()].sort((a, b) => {
           const stopRouteA = a[1][0];
           const stopRouteB = b[1][0];
@@ -58,20 +59,23 @@ module.exports = NodeHelper.create({
           return 1;
         }));
 
-        const stopName = new Map(
-          [...stopInfoMapSorted]
+        const stopName = new Map([...stopInfoMapSorted]
             .filter(([k, v]) => v[0].stop.id == stopID)
         ).values().next().value[0].stop.name;
 
+        // Convert the map back to array
         const stopInfoSorted = Array.from(stopInfoMapSorted).reduce((obj, [key, value]) => (
           Object.assign(obj, { [key]: value })
         ), {});
+
         self.sendSocketNotification("STOP_ITEM", {
           stopID: stopID,
           stopName: stopName,
           stopInfo: stopInfoSorted
         });
-        for (const [key, stop] of Object.entries(fetcher.item())) {
+
+        // Fetch the ETA for the stop
+        for (const [key, stop] of Object.entries(stopInfoSorted)) {
           // Find the stop info
           if (!('stopInfo' in self.stopFetchers[stopID]) && (stop[0].stop.id === stopID)) {
             self.stopFetchers[stopID].stopInfo = stop[0].stop;
