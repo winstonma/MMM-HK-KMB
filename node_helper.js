@@ -60,7 +60,7 @@ module.exports = NodeHelper.create({
         }));
 
         const stopName = new Map([...stopInfoMapSorted]
-            .filter(([k, v]) => v[0].stop.id == stopID)
+          .filter(([k, v]) => v[0].stop.id == stopID)
         ).values().next().value[0].stop.name;
 
         // Convert the map back to array
@@ -140,13 +140,9 @@ module.exports = NodeHelper.create({
     let stops = {};
 
     for (const [stopID, stopFetcher] of Object.entries(self.stopFetchers)) {
-      let etas = [];
-      Object.values(stopFetcher['etaFetchers']).forEach((etaFetcher) => {
-        if (etaFetcher.items().length != 0) {
-          etas.push(etaFetcher.items());
-        }
-      });
-      stops[stopID] = etas;
+      stops[stopID] = Object.values(stopFetcher['etaFetchers'])
+        .filter((etaFetcher) => etaFetcher.items().length != 0)
+        .map((etaFetcher) => etaFetcher.items());
     }
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
