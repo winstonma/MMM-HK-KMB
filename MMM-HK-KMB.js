@@ -68,18 +68,17 @@ Module.register("MMM-HK-KMB", {
    * registers the stops to be used by the backend.
    */
   registerStops: function () {
-    for (var f in this.config.stops) {
-      var stop = this.config.stops[f];
+    Object.values(this.config.stops).forEach((stop) => {
       this.sendSocketNotification("ADD_STOP", {
         stop: stop,
         config: this.config
       });
-    }
+    });
   },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
-      for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
+      Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
         if (payload[stopID]) {
           Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
             routeInfo[0].etas = payload[stopID].find(x =>
@@ -88,7 +87,7 @@ Module.register("MMM-HK-KMB", {
           });
           this.updateDom();
         }
-      }
+      });
     } else if (notification === "STOP_ITEM") {
       if (this.config.stops.find(element => element.stopID == payload.stopID) != undefined) {
         this.stopInfo[payload.stopID] = payload;

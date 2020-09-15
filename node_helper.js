@@ -139,11 +139,11 @@ module.exports = NodeHelper.create({
     const self = this;
     let stops = {};
 
-    for (const [stopID, stopFetcher] of Object.entries(self.stopFetchers)) {
+    Object.entries(self.stopFetchers).forEach(([stopID, stopFetcher]) => {
       stops[stopID] = Object.values(stopFetcher['etaFetchers'])
         .filter((etaFetcher) => etaFetcher.items().length != 0)
         .map((etaFetcher) => etaFetcher.items());
-    }
+    });
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
 });
