@@ -75,9 +75,9 @@ module.exports = NodeHelper.create({
         });
 
         // Fetch the ETA for the stop
-        for (const [key, stop] of Object.entries(stopInfoSorted)) {
+        Object.values(stopInfoSorted).forEach((stop) => {
           self.createETAFetcher(stopID, stop[0]);
-        }
+        });
       });
       fetcher.onError(function (fetcher, error) {
         self.sendSocketNotification("FETCH_ERROR", {
@@ -141,11 +141,11 @@ module.exports = NodeHelper.create({
 
     for (const [stopID, stopFetcher] of Object.entries(self.stopFetchers)) {
       let etas = [];
-      for (const [etcherKey, etaFetcher] of Object.entries(stopFetcher['etaFetchers'])) {
+      Object.values(stopFetcher['etaFetchers']).forEach((etaFetcher) => {
         if (etaFetcher.items().length != 0) {
           etas.push(etaFetcher.items());
         }
-      }
+      });
       stops[stopID] = etas;
     }
     self.sendSocketNotification("ETA_ITEMS", stops);

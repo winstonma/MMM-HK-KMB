@@ -123,12 +123,12 @@ Module.register("MMM-HK-KMB", {
 
       table.appendChild(this.createSpacerRow());
 
-      for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
+      Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
         if (routeInfo[0].etas) {
           data = this.createDataRow(routeInfo);
           table.appendChild(data);
         }
-      }
+      });
 
       if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
         table.appendChild(this.createSpacerRow());
@@ -137,34 +137,6 @@ Module.register("MMM-HK-KMB", {
 
       wrapper.appendChild(table);
     })
-    for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
-      let header = document.createElement("header");
-      header.innerHTML = this.config.stopName ?? stopInfo.stopName;
-      wrapper.appendChild(header);
-
-      // Start creating connections table
-      let table = document.createElement("table");
-      table.classList.add("small", "table");
-      table.border = '0';
-
-      table.appendChild(this.createLabelRow());
-
-      table.appendChild(this.createSpacerRow());
-
-      for (const [routeID, routeInfo] of Object.entries(stopInfo.stopInfo)) {
-        if (routeInfo[0].etas) {
-          data = this.createDataRow(routeInfo);
-          table.appendChild(data);
-        }
-      }
-
-      if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
-        table.appendChild(this.createSpacerRow());
-        table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
-      }
-
-      wrapper.appendChild(table);
-    }
 
     return wrapper;
   },
