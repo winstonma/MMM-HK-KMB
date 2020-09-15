@@ -82,7 +82,8 @@ Module.register("MMM-HK-KMB", {
       for (const [stopID, stopInfo] of Object.entries(this.stopInfo)) {
         if (payload[stopID]) {
           Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
-            routeInfo[0].etas = payload[stopID].find(x => JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route));
+            routeInfo[0].etas = payload[stopID].find(x =>
+              JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route));
           });
         }
         this.updateDom();
@@ -123,12 +124,23 @@ Module.register("MMM-HK-KMB", {
 
       table.appendChild(this.createSpacerRow());
 
-      Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
-        if (routeInfo[0].etas) {
-          data = this.createDataRow(routeInfo);
-          table.appendChild(data);
-        }
-      });
+      if (Object.keys(stopInfo.stopInfo).length == 0) {
+        let row = document.createElement("tr");
+
+        let line = document.createElement("td");
+        line.colSpan = 3;
+        line.innerHTML = this.translate("LOADING");
+        row.appendChild(line);
+
+        table.appendChild(row);
+      } else {
+        Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
+          if (routeInfo[0].etas) {
+            const data = this.createDataRow(routeInfo);
+            table.appendChild(data);
+          }
+        });
+      }
 
       if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
         table.appendChild(this.createSpacerRow());
