@@ -137,13 +137,15 @@ module.exports = NodeHelper.create({
    */
   broadcastETAs: function () {
     const self = this;
-    let stops = {};
 
-    Object.entries(self.stopFetchers).forEach(([stopID, stopFetcher]) => {
-      stops[stopID] = Object.values(stopFetcher['etaFetchers'])
-        .filter((etaFetcher) => etaFetcher.items().length != 0)
-        .map((etaFetcher) => etaFetcher.items());
-    });
+    const stops = Object.fromEntries(Object.entries(self.stopFetchers)
+      .map(([key, stopFetcher]) =>
+        [key, Object.values(stopFetcher['etaFetchers'])
+          .filter((etaFetcher) => etaFetcher.items().length != 0)
+          .map((etaFetcher) => etaFetcher.items())]
+      )
+    );
+
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
 });
