@@ -39,34 +39,25 @@ module.exports = NodeHelper.create({
       Log.log("Create new stop fetcher for stopID: " + stopID);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
-        const stopInfoMap = new Map(Object.entries(fetcher.item()));
+        // Use the sorting function to arrange the bus route within the stop
+        const stopInfoSorted = Object.fromEntries(Object.entries(fetcher.item())
+          .sort((a, b) => {
+            const stopRouteA = a[1][0];
+            const stopRouteB = b[1][0];
+            if (stopRouteA.stop.sequence != stopRouteB.stop.sequence) {
+              if (stopRouteA.stop.sequence === "999")
+                return 1;
+              if (stopRouteB.stop.sequence === "999")
+                return -1;
+            }
+            if (stopRouteA.stop.id != stopRouteB.stop.id) {
+              return stopRouteA.stop.id > stopRouteB.stop.id ? 1 : -1;
+            }
+            return (stopRouteA.variant.route.number < stopRouteB.variant.route.number) ? -1 : 1;
+          })
+        );
 
-        // Sort the map
-        const stopInfoMapSorted = new Map([...stopInfoMap.entries()].sort((a, b) => {
-          const stopRouteA = a[1][0];
-          const stopRouteB = b[1][0];
-          if (stopRouteA.stop.sequence != stopRouteB.stop.sequence) {
-            if (stopRouteA.stop.sequence === "999")
-              return 1;
-            if (stopRouteB.stop.sequence === "999")
-              return -1;
-          }
-          if (stopRouteA.stop.id != stopRouteB.stop.id) {
-            return stopRouteA.stop.id > stopRouteB.stop.id ? 1 : -1;
-          }
-          if (stopRouteA.variant.route.number < stopRouteB.variant.route.number)
-            return -1;
-          return 1;
-        }));
-
-        const stopName = new Map([...stopInfoMapSorted]
-          .filter(([k, v]) => v[0].stop.id == stopID)
-        ).values().next().value[0].stop.name;
-
-        // Convert the map back to array
-        const stopInfoSorted = Array.from(stopInfoMapSorted).reduce((obj, [key, value]) => (
-          Object.assign(obj, { [key]: value })
-        ), {});
+        const stopName = Object.values(stopInfoSorted).find(v => v[0].stop.id == stopID)[0].stop.name;
 
         self.sendSocketNotification("STOP_ITEM", {
           stopID: stopID,
