@@ -41,19 +41,17 @@ module.exports = NodeHelper.create({
       fetcher.onReceive(function (fetcher) {
         // Use the sorting function to arrange the bus route within the stop
         const stopInfoSorted = Object.fromEntries(Object.entries(fetcher.item())
-          .sort((a, b) => {
-            const stopRouteA = a[1][0];
-            const stopRouteB = b[1][0];
-            if (stopRouteA.stop.sequence != stopRouteB.stop.sequence) {
-              if (stopRouteA.stop.sequence === "999")
+          .sort(([,[a]], [,[b]]) => {
+            if (a.stop.sequence != b.stop.sequence) {
+              if (a.stop.sequence === "999")
                 return 1;
-              if (stopRouteB.stop.sequence === "999")
+              if (b.stop.sequence === "999")
                 return -1;
             }
-            if (stopRouteA.stop.id != stopRouteB.stop.id) {
-              return stopRouteA.stop.id > stopRouteB.stop.id ? 1 : -1;
+            if (a.stop.id != b.stop.id) {
+              return a.stop.id > b.stop.id ? 1 : -1;
             }
-            return (stopRouteA.variant.route.number < stopRouteB.variant.route.number) ? -1 : 1;
+            return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
           })
         );
 
