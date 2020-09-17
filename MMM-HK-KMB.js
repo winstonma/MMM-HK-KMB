@@ -239,7 +239,7 @@ Module.register("MMM-HK-KMB", {
     let row = document.createElement("tr");
 
     let line = document.createElement("td");
-    line.className = "line";
+    line.className = routeObj.sequence == 999 ? "line medium" : "line";
     line.innerHTML = routeObj.variant.route.number;
     row.appendChild(line);
 
