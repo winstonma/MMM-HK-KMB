@@ -80,9 +80,9 @@ Module.register("MMM-HK-KMB", {
     if (notification === "ETA_ITEMS") {
       Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
         if (payload[stopID]) {
-          Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
-            routeInfo[0].etas = payload[stopID].find(x =>
-              JSON.stringify(x[0].stopRoute.variant.route) === JSON.stringify(routeInfo[0].variant.route)
+          Object.values(stopInfo.stopInfo).forEach(([routeInfo,]) => {
+            routeInfo.etas = payload[stopID].find(([x,]) =>
+              JSON.stringify(x.stopRoute.variant.route) === JSON.stringify(routeInfo.variant.route)
             );
           });
           this.updateDom();
@@ -245,11 +245,10 @@ Module.register("MMM-HK-KMB", {
 
     let departure = document.createElement("td");
     departure.className = "departure";
-    etaArray = [];
-    routeObj[0].etas.map((etaInfoItem) => {
+    const etaArray = routeObj[0].etas.map((etaInfoItem) => {
       const etaStr = moment(etaInfoItem.time, 'HH:mm').format(this.config.timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
-      etaArray.push(etaStr + remarkStr);
+      return (etaStr + remarkStr);
     });
     departure.innerHTML = etaArray.toString();
     row.appendChild(departure);
