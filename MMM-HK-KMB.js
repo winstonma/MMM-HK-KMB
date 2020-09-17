@@ -82,9 +82,10 @@ Module.register("MMM-HK-KMB", {
         if (payload[stopID]) {
           Object.values(stopInfo.stopInfo).forEach(routeInfos => {
             routeInfos.forEach(routeInfo => {
-              routeInfo.etas = payload[stopID].find(([x,]) => {
-                return JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop);
-              });
+              routeInfo.etas = payload[stopID].find(([x,]) =>
+                ((JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop)) &&
+                  (JSON.stringify(x.stopRoute.variant) === JSON.stringify(routeInfo.variant)))
+              );
             });
           });
           this.updateDom();
