@@ -80,10 +80,12 @@ Module.register("MMM-HK-KMB", {
     if (notification === "ETA_ITEMS") {
       Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
         if (payload[stopID]) {
-          Object.values(stopInfo.stopInfo).forEach(([routeInfo,]) => {
-            routeInfo.etas = payload[stopID].find(([x,]) =>
-              JSON.stringify(x.stopRoute.variant.route) === JSON.stringify(routeInfo.variant.route)
-            );
+          Object.values(stopInfo.stopInfo).forEach(routeInfos => {
+            routeInfos.forEach(routeInfo => {
+              routeInfo.etas = payload[stopID].find(([x,]) => {
+                return JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop);
+              });
+            });
           });
           this.updateDom();
         }
@@ -134,11 +136,13 @@ Module.register("MMM-HK-KMB", {
 
         table.appendChild(row);
       } else {
-        Object.values(stopInfo.stopInfo).forEach((routeInfo) => {
-          if (routeInfo[0].etas) {
-            const data = this.createDataRow(routeInfo);
-            table.appendChild(data);
-          }
+        Object.values(stopInfo.stopInfo).forEach(routeInfos => {
+          routeInfos.forEach(routeInfo => {
+            if (routeInfo.etas) {
+              const data = this.createDataRow(routeInfo);
+              table.appendChild(data);
+            }
+          });
         });
       }
 
@@ -235,17 +239,17 @@ Module.register("MMM-HK-KMB", {
 
     let line = document.createElement("td");
     line.className = "line";
-    line.innerHTML = routeObj[0].variant.route.number;
+    line.innerHTML = routeObj.variant.route.number;
     row.appendChild(line);
 
     let destination = document.createElement("td");
     destination.className = "destination";
-    destination.innerHTML = routeObj[0].variant.destination;
+    destination.innerHTML = routeObj.variant.destination;
     row.appendChild(destination);
 
     let departure = document.createElement("td");
     departure.className = "departure";
-    const etaArray = routeObj[0].etas.map((etaInfoItem) => {
+    const etaArray = routeObj.etas.map((etaInfoItem) => {
       const etaStr = moment(etaInfoItem.time, 'HH:mm').format(this.config.timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
       return (etaStr + remarkStr);

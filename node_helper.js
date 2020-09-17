@@ -64,8 +64,10 @@ module.exports = NodeHelper.create({
         });
 
         // Fetch the ETA for the stop
-        Object.values(stopInfoSorted).forEach((stop) => {
-          self.createETAFetcher(stopID, stop[0]);
+        Object.values(stopInfoSorted).forEach(stops => {
+          stops.forEach(stop => {
+            self.createETAFetcher(stopID, stop);
+          });
         });
       });
       fetcher.onError(function (fetcher, error) {
@@ -97,7 +99,7 @@ module.exports = NodeHelper.create({
     const reloadInterval = 60 * 1000;
     let fetcher = new ETAFetcher(stop, reloadInterval);
 
-    const fetcherKey = JSON.stringify(stop.variant);
+    const fetcherKey = JSON.stringify(stop);
 
     if (!Object.keys(self.stopFetchers[stopID]["etaFetchers"]).includes(fetcherKey)) {
       Log.log("Create new ETA fetcher for route: " + stop.variant.route.number + " - Interval: " + reloadInterval);
