@@ -55,9 +55,7 @@ module.exports = NodeHelper.create({
           });
 
         let stopInfoSorted = {}
-        stopInfoSortedArray.forEach(item => stopInfoSorted[item[0]] = item[1]);
-
-        console.log(stopInfoSorted);
+        stopInfoSortedArray.forEach(([key, value]) => stopInfoSorted[key] = value);
 
         const stopName = Object.values(stopInfoSorted).find(v => v[0].stop.id == stopID)[0].stop.name;
 
@@ -141,7 +139,7 @@ module.exports = NodeHelper.create({
       );
 
     let stops = {}
-    stopsArray.forEach(item => stops[item[0]] = item[1]);
+    stopsArray.forEach(([key, value]) => stops[key] = value);
 
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
