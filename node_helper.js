@@ -40,8 +40,8 @@ module.exports = NodeHelper.create({
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive(function (fetcher) {
         // Use the sorting function to arrange the bus route within the stop
-        const stopInfoSorted = Object.fromEntries(Object.entries(fetcher.item())
-          .sort(([,[a]], [,[b]]) => {
+        const stopInfoSortedArray = Object.entries(fetcher.item())
+          .sort(([, [a]], [, [b]]) => {
             if (a.stop.sequence != b.stop.sequence) {
               if (a.stop.sequence === "999")
                 return 1;
@@ -52,8 +52,12 @@ module.exports = NodeHelper.create({
               return a.stop.id > b.stop.id ? 1 : -1;
             }
             return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
-          })
-        );
+          });
+
+        let stopInfoSorted = {}
+        stopInfoSortedArray.forEach(item => stopInfoSorted[item[0]] = item[1]);
+
+        console.log(stopInfoSorted);
 
         const stopName = Object.values(stopInfoSorted).find(v => v[0].stop.id == stopID)[0].stop.name;
 
@@ -129,13 +133,15 @@ module.exports = NodeHelper.create({
   broadcastETAs: function () {
     const self = this;
 
-    const stops = Object.fromEntries(Object.entries(self.stopFetchers)
+    const stopsArray = Object.entries(self.stopFetchers)
       .map(([key, stopFetcher]) =>
         [key, Object.values(stopFetcher['etaFetchers'])
           .filter((etaFetcher) => etaFetcher.items().length != 0)
           .map((etaFetcher) => etaFetcher.items())]
-      )
-    );
+      );
+
+    let stops = {}
+    stopsArray.forEach(item => stops[item[0]] = item[1]);
 
     self.sendSocketNotification("ETA_ITEMS", stops);
   },
