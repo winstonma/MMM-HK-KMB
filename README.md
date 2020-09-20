@@ -8,11 +8,11 @@ It's always nice to see mirrors using my work, so feel free to send me some scre
 Lastly, why not join in on our discussions at the official [MagicMirror<sup>2</sup> Forum](http://forum.magicmirror.builders/)?
 
 ## Reverse Engineering Process
-I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-mmm-hk-kmb-module-db6eb0181eb6) about the reverse engineering process. Hope you could enjoy.
+I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-mmm-hk-kmb-module-db6eb0181eb6) about the reverse engineering process. Hope you could enjoy it.
 
 ## Screenshots
 
-Here is the screenshots with different language settings:
+Here are the screenshots with different language settings:
 
 * `en`
 
@@ -52,7 +52,7 @@ npm install
 ```
 
 ## Module behavior
-Please note that this module auto-creates a module header which displays the name of the chosen Hong Kong local transport stop. It is therefore recommended not to add a 'header' entry to your config.js for this module.<P>
+Please note that this module auto-creates a module header that displays the name of the chosen Hong Kong local transport stop. It is therefore recommended not to add a 'header' entry to your config.js for this module.<P>
 This module automatically disappears from your mirror as soon as a station has stopped offering connections at night. It reappears as soon as your chosen station is scheduled to be served again.<P>
 This module has been programmed to allow for multiple instances. Simply add more MMM-HK-KMB config entries to your config.js file to display multiple stations and configure them according to your needs.
 
@@ -99,9 +99,9 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 ## Find the `stopID`
 1. Open your web browser and navigate to the [kmb-lwb-combined-headway-eta](http://kmb_eta.csproject.org/) page, developed by miklcct.
 2. In the `Enter the route number:` box, enter the KMB Bus route number that passes the stop. Then press the submit button. The destination and the home would be displayed.
-3. After the submit of bus route, the route origin and destination would be displayed. Choose the right diretcion by clicking `Switch direction` button.
+3. After the submit of the bus route, the route origin and destination would be displayed. Choose the right direction by clicking the `Switch direction` button.
 4. In the `Choose a route variant:` infobox, select the variant.
-5. In the `Choose a stop in the list:` infobox, there is a list of stop with the `stopID` displayed in bracket. Fill the `stopID` in the `config.js`.
+5. In the `Choose a stop in the list:` infobox, there is a list of stops with the `stopID` displayed in the bracket. Fill the `stopID` in the `config.js`.
 
 ## Config Options
 | **Option** | **Default** | **Description** |
