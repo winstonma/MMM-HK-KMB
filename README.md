@@ -14,18 +14,9 @@ I wrote an article on [Medium](https://medium.com/@winstonhyypia/the-making-of-m
 
 Here are the screenshots with different language settings:
 
-* `en`
-
-    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_en.png)
-
-* `zh-tw` and `zh-hk`
-
-    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-tw.png)
-
-* `zh-cn`
-
-    ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-cn.png)
-
+`en`             |  `zh-tw` or `zh-hk`             |  `zh-cn`
+:-------------------------:|:-------------------------:|:-------------------------:
+![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_en.png)  |  ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-tw.png) |  ![MMM-HK-KMB module running in MagicMirror<sup>2</sup>](screenshots/screenshot_zh-cn.png)
 
 ## Current version
 
