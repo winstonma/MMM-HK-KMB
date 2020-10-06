@@ -51,7 +51,7 @@ Module.register("MMM-HK-KMB", {
   },
 
   getStyles: function () {
-    return ["MMM-HK-KMB.css"];
+    return ["MMM-HK-KMB.css", "font-awesome.css"];
   },
 
   start: function () {
@@ -239,8 +239,10 @@ Module.register("MMM-HK-KMB", {
     let row = document.createElement("tr");
 
     let line = document.createElement("td");
-    line.className = routeObj.sequence == 999 ? "line medium" : "line";
+    line.className = "line";
     line.innerHTML = routeObj.variant.route.number;
+    if (routeObj.sequence == 999)
+      line.innerHTML += '<sup><i class="fas fa-sign""></i></sup>';
     row.appendChild(line);
 
     let destination = document.createElement("td");
