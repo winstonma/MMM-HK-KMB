@@ -242,7 +242,7 @@ Module.register("MMM-HK-KMB", {
     line.className = "line";
     line.innerHTML = routeObj.variant.route.number;
     if (routeObj.sequence == 999)
-      line.innerHTML += '<sup><i class="fas fa-sign""></i></sup>';
+      line.innerHTML += '<sup><i class="fas fa-sign"></i></sup>';
     row.appendChild(line);
 
     let destination = document.createElement("td");
