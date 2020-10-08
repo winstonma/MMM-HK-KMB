@@ -38,28 +38,14 @@ module.exports = NodeHelper.create({
       Log.log(`Create new stop fetcher for stopID: ${stopID}`);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive((fetcher) => {
-        // Use the sorting function to arrange the bus route within the stop
-        const stopInfoSorted = Object.entries(fetcher.item())
-          .sort(([, [a]], [, [b]]) => {
-            if (a.stop.sequence != b.stop.sequence) {
-              if (a.stop.sequence === "999")
-                return 1;
-              if (b.stop.sequence === "999")
-                return -1;
-            }
-            if (a.stop.id != b.stop.id) {
-              return a.stop.id > b.stop.id ? 1 : -1;
-            }
-            return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
-          })
-          .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+        const stopInfo = fetcher.item();
 
-        const stopName = Object.values(stopInfoSorted).find(v => v[0].stop.id == stopID)[0].stop.name;
+        const stopName = Object.values(stopInfo).find(v => v[0].stop.id == stopID)[0].stop.name;
 
         this.sendSocketNotification("STOP_ITEM", {
           stopID: stopID,
           stopName: stopName,
-          stopInfo: stopInfoSorted
+          stopInfo: stopInfo
         });
 
         // Remove all exising ETA fetchers, if stop info is being updated
@@ -69,7 +55,7 @@ module.exports = NodeHelper.create({
         }
 
         // Fetch the ETA for the stop
-        Object.values(stopInfoSorted).forEach(stops => {
+        Object.values(stopInfo).forEach(stops => {
           stops.forEach(stop => {
             this.createETAFetcher(stopID, stop, config);
           });

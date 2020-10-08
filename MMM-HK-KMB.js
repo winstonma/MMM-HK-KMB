@@ -2,7 +2,7 @@
  * Module: MMM-HK-KMB
  *
  * By Winston / https://github.com/winstonma
- * MIT Licensed.
+ * AGPL-3.0 Licensed.
  */
 
 // String replacer
@@ -55,7 +55,6 @@ Module.register("MMM-HK-KMB", {
   },
 
   start: function () {
-    var self = this;
     Log.info("Starting module: " + this.name);
 
     // Collect the stop info (including the routes that the stop)
@@ -64,7 +63,7 @@ Module.register("MMM-HK-KMB", {
     this.registerStops();
   },
 
-  /* registerStops()
+  /*
    * registers the stops to be used by the backend.
    */
   registerStops: function () {
@@ -74,6 +73,42 @@ Module.register("MMM-HK-KMB", {
         config: this.config
       });
     });
+  },
+
+  /**
+  * Generate an ordered list of items for this configured module.
+  *
+  * @param {object} etas An object with ETAs returned by the node helper.
+  */
+  generateStopInfo: function (stop) {
+    if (this.subscribedToBusStop(stop.stopID)) {
+      // Use the sorting function to arrange the bus route within the stop
+      stop.stopInfo = Object.entries(stop.stopInfo)
+        .sort(([, [a]], [, [b]]) => {
+          if (a.stop.sequence != b.stop.sequence) {
+            if (a.stop.sequence === "999")
+              return 1;
+            if (b.stop.sequence === "999")
+              return -1;
+          }
+          if (a.stop.id != b.stop.id) {
+            return a.stop.id > b.stop.id ? 1 : -1;
+          }
+          return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
+        })
+        .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+      this.stopInfo[stop.stopID] = stop;
+    }
+  },
+
+  /**
+   * Check if this module is configured to show this ETA.
+   *
+   * @param {string} stopID stopID to check.
+   * @returns {boolean} True if it is subscribed, false otherwise
+   */
+  subscribedToBusStop: function (stopID) {
+    return this.config.stops.some(element => element.stopID === stopID);
   },
 
   socketNotificationReceived: function (notification, payload) {
@@ -92,15 +127,13 @@ Module.register("MMM-HK-KMB", {
         }
       });
     } else if (notification === "STOP_ITEM") {
-      if (this.config.stops.find(element => element.stopID == payload.stopID) != undefined) {
-        this.stopInfo[payload.stopID] = payload;
-        this.updateDom();
-      }
+      this.generateStopInfo(payload);
+      this.updateDom();
     } else if (notification === "FETCH_ERROR") {
-      Log.error("Calendar Error. Could not fetch calendar: " + payload.url);
+      Log.error("MMM-HK-KMB Error. Could not fetch Stop: " + payload.url);
       this.loaded = true;
     } else if (notification === "INCORRECT_URL") {
-      Log.error("Calendar Error. Incorrect url: " + payload.url);
+      Log.error("MMM-HK-KMB Error. Incorrect url: " + payload.url);
     }
   },
 
