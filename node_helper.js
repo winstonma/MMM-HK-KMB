@@ -21,18 +21,20 @@ module.exports = NodeHelper.create({
     // Override socketNotificationReceived received.
     socketNotificationReceived: function (notification, payload) {
     if (notification === "ADD_STOP") {
-      this.getStopInfo(payload.stop.stopID, payload.config);
+      this.getStopInfo(payload.stop, payload.config);
     }
   },
 
   /**
    * Obtain the route pass through this bus stop
    *
-   * @param {object} stopID The stop ID.
+   * @param {object} stopConfig The stop config.
    * @param {object} config The configuration object.
    */
-  getStopInfo: function (stopID, config) {
+  getStopInfo: function (stopConfig, config) {
     let fetcher;
+
+    const stopID = stopConfig.stopID;
 
     if (typeof this.stopFetchers[stopID] === "undefined") {
       Log.log(`Create new stop fetcher for stopID: ${stopID}`);
@@ -54,7 +56,7 @@ module.exports = NodeHelper.create({
         // Fetch the ETA for the stop
         Object.values(stopInfo).forEach(stops => {
           stops.forEach(stop => {
-            this.createETAFetcher(stopID, stop, config);
+            this.createETAFetcher(stopConfig, stop, config);
           });
         });
       });
@@ -80,12 +82,13 @@ module.exports = NodeHelper.create({
   /**
    * Creates a fetcher for collecting ETA info
    *
-   * @param {stopID} the stop ID (a string)
+   * @param {stopConfig} the stopConfig (a string)
    * @param {stop} the stop info (an object)
    * @param {config} the config parameter (an object)
    */
-  createETAFetcher: function (stopID, stop, config) {
-    const reloadInterval = config.reloadInterval || 5 * 60 * 1000;
+  createETAFetcher: function (stopConfig, stop, config) {
+    const stopID = stopConfig.stopID;
+    const reloadInterval = stopConfig.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
     let fetcher = new ETAFetcher(stop, reloadInterval);
 
     const fetcherKey = JSON.stringify(stop);
