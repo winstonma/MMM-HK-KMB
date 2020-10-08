@@ -76,33 +76,69 @@ Module.register("MMM-HK-KMB", {
   },
 
   /**
-  * Generate an ordered list of items for this configured module.
-  *
-  * @param {object} etas An object with ETAs returned by the node helper.
-  */
+   * Generate an ordered list of items for this configured module.
+   *
+   * @param {object} etas An object with ETAs returned by the node helper.
+   */
+  generateETAInfo: function (eta) {
+    let dataUpdated = false;
+    console.log(Object.values(this.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
+    Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
+      if (eta[stopID]) {
+        dataUpdated = true;
+        Object.values(stopInfo.stopInfo).forEach(routeInfos => {
+          routeInfos.forEach(routeInfo => {
+            routeInfo.etas = eta[stopID].find(([x,]) =>
+              ((JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop)) &&
+                (JSON.stringify(x.stopRoute.variant) === JSON.stringify(routeInfo.variant)))
+            );
+          });
+        });
+      }
+    });
+    console.log(Object.values(this.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
+    if (dataUpdated)
+      this.updateDom();
+  },
+
+  /**
+   * Generate an ordered list of items for this configured module.
+   *
+   * @param {object} stop An object with stop returned by the node helper.
+   */
   generateStopInfo: function (stop) {
     if (this.subscribedToBusStop(stop.stopID)) {
-      // Use the sorting function to arrange the bus route within the stop
+      // Sort the stopInfo
       stop.stopInfo = Object.entries(stop.stopInfo)
         .sort(([, [a]], [, [b]]) => {
+          if (a.stop.id != b.stop.id)
+            return (a.stop.id > b.stop.id) ? 1 : -1;
+
+          if (a.variant.route.number != b.variant.route.number)
+            return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
+
           if (a.stop.sequence != b.stop.sequence) {
             if (a.stop.sequence === "999")
-              return 1;
-            if (b.stop.sequence === "999")
               return -1;
+            if (b.stop.sequence === "999")
+              return 1;
           }
-          if (a.stop.id != b.stop.id) {
-            return a.stop.id > b.stop.id ? 1 : -1;
-          }
-          return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
         })
         .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+      debugger
+
+      console.log(Object.values(stop.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
+
+      // Add the stopName
+      stop.stopName = Object.values(stop.stopInfo).find(([v]) => v.stop.id == stop.stopID)[0].stop.name;
       this.stopInfo[stop.stopID] = stop;
+
+      this.updateDom();
     }
   },
 
   /**
-   * Check if this module is configured to show this ETA.
+   * Check if this module is configured to show this stop.
    *
    * @param {string} stopID stopID to check.
    * @returns {boolean} True if it is subscribed, false otherwise
@@ -113,22 +149,9 @@ Module.register("MMM-HK-KMB", {
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
-      Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
-        if (payload[stopID]) {
-          Object.values(stopInfo.stopInfo).forEach(routeInfos => {
-            routeInfos.forEach(routeInfo => {
-              routeInfo.etas = payload[stopID].find(([x,]) =>
-                ((JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop)) &&
-                  (JSON.stringify(x.stopRoute.variant) === JSON.stringify(routeInfo.variant)))
-              );
-            });
-          });
-          this.updateDom();
-        }
-      });
+      this.generateETAInfo(payload);
     } else if (notification === "STOP_ITEM") {
       this.generateStopInfo(payload);
-      this.updateDom();
     } else if (notification === "FETCH_ERROR") {
       Log.error("MMM-HK-KMB Error. Could not fetch Stop: " + payload.url);
       this.loaded = true;
@@ -137,6 +160,7 @@ Module.register("MMM-HK-KMB", {
     }
   },
 
+  // Override dom generator.
   getDom: function () {
     let wrapper = document.createElement("div");
 

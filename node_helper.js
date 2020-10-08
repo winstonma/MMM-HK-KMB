@@ -40,11 +40,8 @@ module.exports = NodeHelper.create({
       fetcher.onReceive((fetcher) => {
         const stopInfo = fetcher.item();
 
-        const stopName = Object.values(stopInfo).find(v => v[0].stop.id == stopID)[0].stop.name;
-
         this.sendSocketNotification("STOP_ITEM", {
           stopID: stopID,
-          stopName: stopName,
           stopInfo: stopInfo
         });
 
