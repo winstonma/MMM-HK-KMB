@@ -120,8 +120,10 @@ Module.register("MMM-HK-KMB", {
           if (a.stop.sequence != b.stop.sequence) {
             if (a.stop.sequence === "999")
               return -1;
-            if (b.stop.sequence === "999")
+            else if (b.stop.sequence === "999")
               return 1;
+            else
+              return (a.stop.sequence > b.stop.sequence) ? 1 : -1;
           }
         })
         .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
