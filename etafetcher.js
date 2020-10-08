@@ -15,7 +15,7 @@ const Eta = require('./scripts/Eta.js')
  * @param {number} reloadInterval Reload interval in milliseconds.
  * @class
  */
-var ETAFetcher = function (stop, reloadInterval) {
+const ETAFetcher = function (stop, reloadInterval) {
   const self = this;
 
   let reloadTimer = null;
