@@ -127,9 +127,6 @@ Module.register("MMM-HK-KMB", {
           }
         })
         .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-      debugger
-
-      console.log(Object.values(stop.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
 
       // Add the stopName
       stop.stopName = Object.values(stop.stopInfo).find(([v]) => v.stop.id == stop.stopID)[0].stop.name;
