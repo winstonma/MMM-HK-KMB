@@ -63,6 +63,10 @@ module.exports = NodeHelper.create({
           stopInfo: stopInfoSorted
         });
 
+        // Remove all exising ETA fetchers, if stop info is being updated
+        if (self.stopFetchers[stopID].etaFetchers)
+          self.stopFetchers[stopID].etaFetchers = {};
+
         // Fetch the ETA for the stop
         Object.values(stopInfoSorted).forEach(stops => {
           stops.forEach(stop => {
@@ -122,14 +126,12 @@ module.exports = NodeHelper.create({
     fetcher.startFetch();
   },
 
-  /* broadcastETAs()
+  /*
    * Creates an object with all feed items of the different registered ETAs,
    * and broadcasts these using sendSocketNotification.
    */
   broadcastETAs: function () {
-    const self = this;
-
-    const stops = Object.entries(self.stopFetchers)
+    const stops = Object.entries(this.stopFetchers)
       .map(([key, stopFetcher]) =>
         [key, Object.values(stopFetcher['etaFetchers'])
           .filter((etaFetcher) => etaFetcher.items().length != 0)
@@ -137,6 +139,6 @@ module.exports = NodeHelper.create({
       )
       .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
-    self.sendSocketNotification("ETA_ITEMS", stops);
+    this.sendSocketNotification("ETA_ITEMS", stops);
   },
 });
