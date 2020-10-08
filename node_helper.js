@@ -63,8 +63,10 @@ module.exports = NodeHelper.create({
         });
 
         // Remove all exising ETA fetchers, if stop info is being updated
-        if (this.stopFetchers[stopID].etaFetchers)
+        if (this.stopFetchers[stopID].etaFetchers) {
+          Object.values(this.stopFetchers[stopID].etaFetchers).forEach(etaFetcher => etaFetcher.clearTimer());
           this.stopFetchers[stopID].etaFetchers = {};
+        }
 
         // Fetch the ETA for the stop
         Object.values(stopInfoSorted).forEach(stops => {

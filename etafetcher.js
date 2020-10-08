@@ -61,6 +61,14 @@ const ETAFetcher = function (stop, reloadInterval) {
   /* public methods */
 
   /**
+   * Clear the existing timer
+   */
+  this.clearTimer = function () {
+    clearTimeout(reloadTimer);
+    reloadTimer = null;
+  }
+
+  /**
    * Update the reload interval, but only if we need to increase the speed.
    *
    * @param {number} interval Interval for the update in milliseconds.
