@@ -1,58 +1,57 @@
 /* Magic Mirror
- * Module: MMM-HK-KMB
+ * Node Helper: MMM-HK-KMB - ETAFetcher
  *
  * By Winston / https://github.com/winstonma
- * MIT Licensed.
+ * AGPL-3.0 Licensed.
  */
 
-const got = require('got');
-const querystring = require('querystring');
+const Log = require("../../js/logger.js");
 const Eta = require('./scripts/Eta.js')
 
-/* ETAFetcher
-
+/**
  * Responsible for requesting an update on the set interval and broadcasting the data.
  *
- * attribute url string - URL of the news feed.
- * attribute reloadInterval number - Reload interval in milliseconds.
+ * @param {string} stop stop object
+ * @param {number} reloadInterval Reload interval in milliseconds.
+ * @class
  */
-
 var ETAFetcher = function (stop, reloadInterval) {
-  var self = this;
-  reloadInterval = (reloadInterval < 1000) ? 1000 : reloadInterval;
+  const self = this;
 
-  var reloadTimer = null;
-  var items = [];
+  let reloadTimer = null;
+  let item = null;
 
-  var fetchFailedCallback = function () { };
-  var itemsReceivedCallback = function () { };
+  let fetchFailedCallback = function () { };
+  let itemsReceivedCallback = function () { };
 
-  let url;
+  if (reloadInterval < 1000) {
+    reloadInterval = 1000;
+  }
 
   /* private methods */
 
-	/* fetchETA()
-	 * Request the ETA.
-	 */
-  var fetchETA = function () {
+  /**
+   * Request the ETA
+   */
+  const fetchETA = function () {
     clearTimeout(reloadTimer);
     reloadTimer = null;
+    item = [];
 
     Eta.get(
       stop
       , function (/** Array */ etas) {
-        items = etas;
+        item = etas;
         self.broadcastItems();
         scheduleTimer();
       }
     );
   };
 
-	/* scheduleTimer()
-	 * Schedule the timer for the next update.
-	 */
-  var scheduleTimer = function () {
-    //console.log('Schedule update timer.');
+  /**
+   * Schedule the timer for the next update.
+   */
+  const scheduleTimer = function () {
     clearTimeout(reloadTimer);
     reloadTimer = setTimeout(function () {
       fetchETA();
@@ -61,33 +60,33 @@ var ETAFetcher = function (stop, reloadInterval) {
 
   /* public methods */
 
-	/* setReloadInterval()
-	 * Update the reload interval, but only if we need to increase the speed.
-	 *
-	 * attribute interval number - Interval for the update in milliseconds.
-	 */
+  /**
+   * Update the reload interval, but only if we need to increase the speed.
+   *
+   * @param {number} interval Interval for the update in milliseconds.
+   */
   this.setReloadInterval = function (interval) {
     if (interval > 1000 && interval < reloadInterval) {
       reloadInterval = interval;
     }
   };
 
-	/* startFetch()
-	 * Initiate fetchETA();
-	 */
+  /**
+   * Initiate fetchETA();
+   */
   this.startFetch = function () {
     fetchETA();
   };
 
-	/* broadcastItems()
-	 * Broadcast the existing items.
-	 */
+  /**
+   * Broadcast the existing item.
+   */
   this.broadcastItems = function () {
-    if (items.length <= 0) {
-      //console.log('No items to broadcast yet.');
+    if (item.length <= 0) {
+      Log.info(`ETA-Fetcher: No item for route ${stop.variant.route.number}`);
       return;
     }
-    //console.log('Broadcasting ' + items.length + ' items.');
+    Log.info(`ETA-Fetcher: Broadcasting item for route ${stop.variant.route.number}`);
     itemsReceivedCallback(self);
   };
 
@@ -99,16 +98,12 @@ var ETAFetcher = function (stop, reloadInterval) {
     fetchFailedCallback = callback;
   };
 
-  this.url = function () {
-    return url;
-  };
-
   this.route = function () {
     return stopInfo.Route;
   }
 
   this.items = function () {
-    return items;
+    return item;
   };
 };
 
