@@ -77,11 +77,10 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
         stops: [
           {
             stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
+            showLabelRow: false,        // Show or hide column headers
+            reloadInterval: 60000 	// How often should the information be updated? (In milliseconds)
           }
         ],
-        inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
-        labelRow: true, // Show or hide column headers
-        reload: 60000 	// How often should the information be updated? (In milliseconds)
       }
     } 						// If this isn't your last module, add a comma after the bracket
 
@@ -98,8 +97,8 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 | **Option** | **Default** | **Description** |
 | :---: | :---: | --- |
 | stopID | HO06-S-1250-0 | <BR>Which stop would you like to have displayed? <BR><EM> Default: HO06-S-1250-0</EM><P> |
-| labelRow<BR>`optional` | true | <BR> Show or hide column headers<BR> <EM>Possible values: true, false</EM><P> |
-| reload<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
+| showLabelRow<BR>`optional` | true | <BR> Show or hide column headers<BR> <EM>Possible values: true, false</EM><P> |
+| reloadInterval<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
 
 ## Acknowledgement
 This project is possible only when given the code [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta), which is developed by miklcct.

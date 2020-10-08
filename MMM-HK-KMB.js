@@ -31,7 +31,7 @@ Module.register("MMM-HK-KMB", {
     ],
     timeFormat: (config.timeFormat !== 24) ? "h:mm" : "HH:mm",
     inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
-    labelRow: true,
+    showLabelRow: true,
     reloadInterval: 1 * 60 * 1000, // every 1 minute
   },
 
@@ -82,7 +82,7 @@ Module.register("MMM-HK-KMB", {
    */
   generateETAInfo: function (eta) {
     let dataUpdated = false;
-    console.log(Object.values(this.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
+
     Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
       if (eta[stopID]) {
         dataUpdated = true;
@@ -96,7 +96,7 @@ Module.register("MMM-HK-KMB", {
         });
       }
     });
-    console.log(Object.values(this.stopInfo).map(stopInfo => Object.keys(stopInfo.stopInfo))[0]);
+
     if (dataUpdated)
       this.updateDom();
   },
@@ -169,7 +169,7 @@ Module.register("MMM-HK-KMB", {
       return wrapper;
     }
 
-    Object.values(this.stopInfo).forEach((stopInfo) => {
+    Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
       let header = document.createElement("header");
       header.innerHTML = stopInfo.stopName;
       wrapper.appendChild(header);
@@ -179,7 +179,12 @@ Module.register("MMM-HK-KMB", {
       table.classList.add("small", "table");
       table.border = '0';
 
-      table.appendChild(this.createLabelRow());
+      const stopConfig = this.config.stops.find(stop => stop.stopID == stopID);
+      const showLabelRow = (typeof stopConfig.showLabelRow !== 'undefined') ? stopConfig.showLabelRow : this.config.showLabelRow;
+
+      if (showLabelRow) {
+        table.appendChild(this.createLabelRow());
+      }
 
       table.appendChild(this.createSpacerRow());
 
