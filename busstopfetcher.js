@@ -6,7 +6,7 @@
  */
 
 const Log = require("../../js/logger.js");
-const schedule = require('node-schedule');
+const cron = require('node-cron');
 const StopRoute = require('./scripts/StopRoute.js');
 const Stop = require('./scripts/Stop.js');
 
@@ -22,9 +22,11 @@ const BusStopFetcher = function (stopID) {
   let item = null;
 
   // Create a schduler to update the bustop info (every 5am)
-  let schduler = schedule.scheduleJob('* 5 * * *', () => {
+  cron.schedule('* 5 * * *', () => {
     Log.log(`BusStop-Fetcher: Fetching stop info for stop ID: ${stopID}`);
     fetchBusStop();
+  }, {
+    timezone: "Asia/Hong_Kong"
   });
 
   let fetchFailedCallback = function () { };
