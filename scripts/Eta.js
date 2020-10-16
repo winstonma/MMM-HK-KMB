@@ -74,21 +74,7 @@ Eta.get = function (stopRoute, callback) {
                         )
                     )
                     .filter(obj => obj.time.match(/^[0-9][0-9]:[0-9][0-9]$/) !== null)
-                    .map(
-                        obj => {
-                            const time = new Date();
-                            time.setHours(Number(obj.time.split(':')[0]), Number(obj.time.split(':')[1]), 0);
-                            if (time.getTime() - Date.now() < -60 * 60 * 1000 * 2) {
-                                // the time is less than 2 hours past - assume midnight rollover
-                                time.setDate(time.getDate() + 1);
-                            }
-                            if (time.getTime() - Date.now() > 60 * 60 * 1000 * 6) {
-                                // the time is more than 6 hours in the future - assume midnight rollover
-                                time.setDate(time.getDate() - 1);
-                            }
-                            return new Eta(stopRoute, time, obj.distance, obj.remark, obj.real_time);
-                        }
-                    )
+                    .map(obj => new Eta(stopRoute, obj.time, obj.distance, obj.remark, obj.real_time))
             );
         }
     };
