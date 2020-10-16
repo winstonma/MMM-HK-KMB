@@ -2,6 +2,7 @@
 	border-spacing: 0px 0px;
 	border-collapse: separate;
 	text-align: left;
+	max-width: 600px;
 }
 
 .MMM-HK-KMB .spacerRow {
@@ -19,7 +20,6 @@
 	text-align: left;
 	color: white;
 	font-weight: normal;
-	width: 60px;
 }
 
 .MMM-HK-KMB .departure {
