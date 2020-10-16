@@ -207,14 +207,6 @@ Module.register("MMM-HK-KMB", {
           .filter(routeInfos => routeInfos.length != 0)
           .forEach(routeInfos => routeInfos.forEach(routeInfo => table.appendChild(this.createDataRow(routeInfo))));
 
-        Object.values(stopInfo.stopInfo)
-          .map(routeInfos => {
-            const retValue = routeInfos.filter(routeInfo => !routeInfo.etas)
-            return (retValue.length >= 0) ? retValue : null;
-          })
-          .filter(routeInfos => routeInfos.length != 0)
-          .map(([routeInfos]) => routeInfos.variant.route.number)
-
         const hideInactiveRoute = (typeof stopConfig.hideInactiveRoute !== 'undefined') ? stopConfig.hideInactiveRoute : this.config.hideInactiveRoute;
 
         // Show routes without active ETA
