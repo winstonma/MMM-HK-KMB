@@ -170,9 +170,7 @@ Module.register("MMM-HK-KMB", {
     }
 
     Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
-      let header = document.createElement("header");
-      header.innerHTML = stopInfo.stopName;
-      wrapper.appendChild(header);
+      this.data.header = stopInfo.stopName;
 
       // Start creating connections table
       let table = document.createElement("table");
