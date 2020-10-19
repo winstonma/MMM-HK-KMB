@@ -178,7 +178,7 @@ Module.register("MMM-HK-KMB", {
       table.border = '0';
 
       const stopConfig = this.config.stops.find(stop => stop.stopID == stopID);
-      const showLabelRow = (typeof stopConfig.showLabelRow !== 'undefined') ? stopConfig.showLabelRow : this.config.showLabelRow;
+      const showLabelRow = (stopConfig.showLabelRow !== undefined) ? stopConfig.showLabelRow : this.config.showLabelRow;
 
       if (showLabelRow) {
         table.appendChild(this.createLabelRow());
@@ -205,7 +205,7 @@ Module.register("MMM-HK-KMB", {
           .filter(routeInfos => routeInfos.length != 0)
           .forEach(routeInfos => routeInfos.forEach(routeInfo => table.appendChild(this.createDataRow(routeInfo))));
 
-        const hideInactiveRoute = (typeof stopConfig.hideInactiveRoute !== 'undefined') ? stopConfig.hideInactiveRoute : this.config.hideInactiveRoute;
+        const hideInactiveRoute = (stopConfig.hideInactiveRoute !== undefined) ? stopConfig.hideInactiveRoute : this.config.hideInactiveRoute;
 
         // Show routes without active ETA
         if (!hideInactiveRoute) {
