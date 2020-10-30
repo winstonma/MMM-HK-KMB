@@ -39,9 +39,16 @@ const ETAFetcher = function (stop, reloadInterval) {
     reloadTimer = null;
     item = [];
 
-    item = await stop.getEtas();
-    self.broadcastItems();
-    scheduleTimer();
+    await stop.getEtas()
+      .then(data => {
+        item = data;
+        self.broadcastItems();
+        scheduleTimer();
+      })
+      .catch(error => {
+        fetchFailedCallback(self, error);
+        scheduleTimer();
+      })
   };
 
   /**

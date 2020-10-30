@@ -46,22 +46,28 @@ const BusStopFetcher = function (stopID) {
    * Request the stop info
    */
   const fetchBusStop = async function () {
-    item = await stop.getStoppings();
-    self.broadcastItems();
+    await stop.getStoppings()
+      .then(data => {
+        item = data;
+        self.broadcastItems();
+      })
+      .catch(error => {
+        fetchFailedCallback(self, error);
+      })
   };
 
   /* public methods */
 
-	/**
-	 * Initiate fetchBusStop();
-	 */
+  /**
+   * Initiate fetchBusStop();
+   */
   this.startFetch = function () {
     fetchBusStop();
   };
 
-	/**
-	 * Broadcast the existing item.
-	 */
+  /**
+   * Broadcast the existing item.
+   */
   this.broadcastItems = function () {
     if (item == null) {
       Log.info("BusStop-Fetcher: No item to broadcast yet.");
