@@ -20,7 +20,7 @@ Here are the screenshots with different language settings:
 
 ## Current version
 
-v1.4.2
+v1.5.0
 
 ## Languages
 As of version 1.4.2, MMM-HK-KMB features language support for `Traditional Chinese (zh-tw and zh-hk)`,  `Simplified Chinese (zh-cn)` and `English (en)`.

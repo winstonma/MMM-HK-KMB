@@ -1,6 +1,10 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.5.0] - 2020-10-30
+* Uses [js-kmb-api](https://github.com/miklcct/js-kmb-api) as fetcher
+* Minor config and bug fixes
+
 ## [1.4.2] - 2020-08-30
 * Reverted the bus stop fetcher performance
 * Merge new config from [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta)
