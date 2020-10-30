@@ -200,6 +200,23 @@ Module.register("MMM-HK-KMB", {
             table.appendChild(data);
           }
         });
+
+        const hideInactiveRoute = (stopConfig.hideInactiveRoute !== undefined) ? stopConfig.hideInactiveRoute : this.config.hideInactiveRoute;
+
+        let printVar = false;
+
+        // Show routes without active ETA
+        if (!hideInactiveRoute) {
+          const inactiveRouteNumberList = Object.values(stopInfo.stopInfo)
+            .map(routeInfo => (routeInfo.etas !== undefined) ? routeInfo : null)
+            .filter(routeInfo => routeInfo !== null)
+            .map(routeInfo => routeInfo.variant.route.number);
+
+          if (inactiveRouteNumberList.length > 0) {
+            const data = this.createNonActiveRouteRow(inactiveRouteNumberList);
+            table.appendChild(data);
+          }
+        }
       }
 
       wrapper.appendChild(table);
