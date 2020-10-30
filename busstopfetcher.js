@@ -7,8 +7,7 @@
 
 const Log = require("../../js/logger.js");
 const cron = require('node-cron');
-const StopRoute = require('./scripts/StopRoute.js');
-const Stop = require('./scripts/Stop.js');
+const Kmb = require('js-kmb-api').default;
 
 /**
  * Responsible for requesting an update and broadcasting the data.
@@ -20,6 +19,15 @@ const BusStopFetcher = function (stopID) {
   const self = this;
 
   let item = null;
+
+  const langTable = {
+    'zh-tw': 'zh-hant',
+    'zh-hk': 'zh-hant',
+    'zh-cn': 'zh-hans'
+  }
+  const lang = langTable[config.language] || 'en';
+  const kmb = new Kmb(lang);
+  const stop = stopID ? new kmb.Stop(stopID, null, null) : null;
 
   // Create a schduler to update the bustop info (every 5am)
   cron.schedule('* 5 * * *', () => {
@@ -34,27 +42,12 @@ const BusStopFetcher = function (stopID) {
 
   /* private methods */
 
-  const update_common_route_list = function (/** Object<string, Array<StopRoute>> */ result) {
-    item = result;
-    self.broadcastItems();
-  }
-
-  /**
-   *
-   * @param {int} count
-   */
-  const update_route_progress = function (count) {
-    // This API can print out the update count, but it is ignored here
-  }
-
   /**
    * Request the stop info
    */
-  const fetchBusStop = function () {
-    const stop = stopID ? new Stop(stopID, null, null) : null;
-    StopRoute.get(stop,
-      update_common_route_list,
-      update_route_progress);
+  const fetchBusStop = async function () {
+    item = await stop.getStoppings();
+    self.broadcastItems();
   };
 
   /* public methods */
@@ -93,6 +86,10 @@ const BusStopFetcher = function (stopID) {
   this.item = function () {
     return item;
   };
+
+  this.stopName = function () {
+    return stop.name;
+  }
 };
 
 module.exports = BusStopFetcher;

@@ -86,13 +86,11 @@ Module.register("MMM-HK-KMB", {
     Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
       if (eta[stopID]) {
         dataUpdated = true;
-        Object.values(stopInfo.stopInfo).forEach(routeInfos => {
-          routeInfos.forEach(routeInfo => {
-            routeInfo.etas = eta[stopID].find(([x,]) =>
-              ((JSON.stringify(x.stopRoute.stop) === JSON.stringify(routeInfo.stop)) &&
-                (JSON.stringify(x.stopRoute.variant) === JSON.stringify(routeInfo.variant)))
-            );
-          });
+        Object.values(stopInfo.stopInfo).forEach(routeInfo => {
+          routeInfo.etas = eta[stopID].find(([x,]) =>
+            ((JSON.stringify(x.stopping.stop) === JSON.stringify(routeInfo.stop)) &&
+              (JSON.stringify(x.stopping.variant) === JSON.stringify(routeInfo.variant)))
+          );
         });
       }
     });
@@ -110,7 +108,7 @@ Module.register("MMM-HK-KMB", {
     if (this.subscribedToBusStop(stop.stopID)) {
       // Sort the stopInfo
       stop.stopInfo = Object.entries(stop.stopInfo)
-        .sort(([, [a]], [, [b]]) => {
+        .sort(([, a], [, b]) => {
           if (a.stop.id != b.stop.id)
             return (a.stop.id > b.stop.id) ? 1 : -1;
 
@@ -129,7 +127,7 @@ Module.register("MMM-HK-KMB", {
         .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
       // Add the stopName
-      stop.stopName = Object.values(stop.stopInfo).find(([v]) => v.stop.id == stop.stopID)[0].stop.name;
+      stop.stopName = stop.stopName;
       this.stopInfo[stop.stopID] = stop;
 
       this.updateDom();
@@ -198,13 +196,11 @@ Module.register("MMM-HK-KMB", {
 
         table.appendChild(row);
       } else {
-        Object.values(stopInfo.stopInfo).forEach(routeInfos => {
-          routeInfos.forEach(routeInfo => {
-            if (routeInfo.etas) {
-              const data = this.createDataRow(routeInfo);
-              table.appendChild(data);
-            }
-          });
+        Object.values(stopInfo.stopInfo).forEach(routeInfo => {
+          if (routeInfo.etas) {
+            const data = this.createDataRow(routeInfo);
+            table.appendChild(data);
+          }
         });
       }
 
@@ -314,7 +310,7 @@ Module.register("MMM-HK-KMB", {
     let departure = document.createElement("td");
     departure.className = "departure";
     const etaArray = routeObj.etas.map((etaInfoItem) => {
-      const etaStr = moment(etaInfoItem.time, 'HH:mm').format(this.config.timeFormat);
+      const etaStr = moment(etaInfoItem.time).format(this.config.timeFormat);
       const remarkStr = this.replaceAll(etaInfoItem.remark, BUSLINELOOKUP).replace(/\s/g, '');
       return (etaStr + remarkStr);
     });

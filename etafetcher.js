@@ -6,7 +6,7 @@
  */
 
 const Log = require("../../js/logger.js");
-const Eta = require('./scripts/Eta.js')
+const Kmb = require('js-kmb-api').default;
 
 /**
  * Responsible for requesting an update on the set interval and broadcasting the data.
@@ -20,6 +20,7 @@ const ETAFetcher = function (stop, reloadInterval) {
 
   let reloadTimer = null;
   let item = null;
+  const kmb = new Kmb;
 
   let fetchFailedCallback = function () { };
   let itemsReceivedCallback = function () { };
@@ -33,19 +34,14 @@ const ETAFetcher = function (stop, reloadInterval) {
   /**
    * Request the ETA
    */
-  const fetchETA = function () {
+  const fetchETA = async function () {
     clearTimeout(reloadTimer);
     reloadTimer = null;
     item = [];
 
-    Eta.get(
-      stop
-      , function (/** Array */ etas) {
-        item = etas;
-        self.broadcastItems();
-        scheduleTimer();
-      }
-    );
+    item = await stop.getEtas();
+    self.broadcastItems();
+    scheduleTimer();
   };
 
   /**

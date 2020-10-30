@@ -18,8 +18,8 @@ module.exports = NodeHelper.create({
     this.stopFetchers = [];
   },
 
-    // Override socketNotificationReceived received.
-    socketNotificationReceived: function (notification, payload) {
+  // Override socketNotificationReceived received.
+  socketNotificationReceived: function (notification, payload) {
     if (notification === "ADD_STOP") {
       this.getStopInfo(payload.stop, payload.config);
     }
@@ -44,7 +44,8 @@ module.exports = NodeHelper.create({
 
         this.sendSocketNotification("STOP_ITEM", {
           stopID: stopID,
-          stopInfo: stopInfo
+          stopInfo: stopInfo,
+          stopName: fetcher.stopName()
         });
 
         // Remove all exising ETA fetchers, if stop info is being updated
@@ -54,10 +55,8 @@ module.exports = NodeHelper.create({
         }
 
         // Fetch the ETA for the stop
-        Object.values(stopInfo).forEach(stops => {
-          stops.forEach(stop => {
-            this.createETAFetcher(stopConfig, stop, config);
-          });
+        Object.values(stopInfo).forEach(stop => {
+          this.createETAFetcher(stopConfig, stop, config);
         });
       });
 
