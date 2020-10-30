@@ -30,9 +30,9 @@ Module.register("MMM-HK-KMB", {
       }
     ],
     timeFormat: (config.timeFormat !== 24) ? "h:mm" : "HH:mm",
-    inactiveRouteCountPerRow: 0,   // how many inactive route would be displayed, 0 means hide all inactive route
+    hideInactiveRoute: true,        // hide inactive route
     showLabelRow: true,
-    reloadInterval: 1 * 60 * 1000, // every 1 minute
+    reloadInterval: 1 * 60 * 1000,  // every 1 minute
   },
 
   // Define required scripts.
@@ -168,9 +168,7 @@ Module.register("MMM-HK-KMB", {
     }
 
     Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
-      let header = document.createElement("header");
-      header.innerHTML = stopInfo.stopName;
-      wrapper.appendChild(header);
+      this.data.header = stopInfo.stopName;
 
       // Start creating connections table
       let table = document.createElement("table");
@@ -178,7 +176,7 @@ Module.register("MMM-HK-KMB", {
       table.border = '0';
 
       const stopConfig = this.config.stops.find(stop => stop.stopID == stopID);
-      const showLabelRow = (typeof stopConfig.showLabelRow !== 'undefined') ? stopConfig.showLabelRow : this.config.showLabelRow;
+      const showLabelRow = (stopConfig.showLabelRow !== undefined) ? stopConfig.showLabelRow : this.config.showLabelRow;
 
       if (showLabelRow) {
         table.appendChild(this.createLabelRow());
@@ -190,7 +188,7 @@ Module.register("MMM-HK-KMB", {
         let row = document.createElement("tr");
 
         let line = document.createElement("td");
-        line.colSpan = 3;
+        line.setAttribute("colSpan", "3");
         line.innerHTML = this.translate("LOADING");
         row.appendChild(line);
 
@@ -249,44 +247,15 @@ Module.register("MMM-HK-KMB", {
   },
 
   createNonActiveRouteRow: function (nonActiveRoute) {
-    let labelRows = document.createDocumentFragment();
+    let labelRow = document.createElement("tr");
+    labelRow.className = "dimmed light xsmall"
 
-    // Remove duplicates and sort
-    const orderedNonActiveRoute = Array.from(new Set(nonActiveRoute)).sort();
-    // Split it into multiple sizes
-    const nonActiveRouteDisplayList = this.chunkArrayInGroups(orderedNonActiveRoute, this.config.inactiveRouteCountPerRow);
+    let lineLabel = document.createElement("td");
+    lineLabel.setAttribute("colSpan", "3");
+    lineLabel.innerHTML = nonActiveRoute.join(', ');
+    labelRow.appendChild(lineLabel)
 
-    nonActiveRouteDisplayList.forEach((nonActiveRouteDisplayRow, count) => {
-      let labelRow = document.createElement("tr");
-
-      let lineLabel = document.createElement("th");
-      if (count == 0) {
-        lineLabel.className = "line";
-        lineLabel.innerHTML = this.translate("INACTIVE");
-      }
-      labelRow.appendChild(lineLabel);
-
-      let destinationLabel = document.createElement("th");
-      destinationLabel.className = "destination";
-      destinationLabel.innerHTML = nonActiveRouteDisplayRow;
-      labelRow.appendChild(destinationLabel);
-
-      labelRows.appendChild(labelRow);
-    });
-
-    return labelRows;
-  },
-
-  createNoTramRow: function () {
-    let noTramRow = document.createElement("tr");
-
-    let noTramHeader = document.createElement("th");
-    noTramHeader.className = "noTramRow";
-    noTramHeader.setAttribute("colSpan", "3");
-    noTramHeader.innerHTML = this.translate("NO-TRAMS");
-    noTramRow.appendChild(noTramHeader);
-
-    return noTramRow;
+    return labelRow;
   },
 
   createDataRow: function (routeObj) {
@@ -327,12 +296,4 @@ Module.register("MMM-HK-KMB", {
       return mapObj[matched];
     });
   },
-
-  chunkArrayInGroups: function (arr, size) {
-    let myArray = [];
-    for (let i = 0; i < arr.length; i += size) {
-      myArray.push(arr.slice(i, i + size));
-    }
-    return myArray;
-  }
 });

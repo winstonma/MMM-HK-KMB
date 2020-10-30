@@ -76,9 +76,10 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
       config: {
         stops: [
           {
-            stopID: 'HO06-S-1250-0',		// Which stop would you like to have displayed?	
-            showLabelRow: false,        // Show or hide column headers
-            reloadInterval: 60000 	// How often should the information be updated? (In milliseconds)
+            stopID: 'HO06-S-1250-0',
+            hideInactiveRoute: false,
+            showLabelRow: false,
+            reloadInterval: 60000
           }
         ],
       }
@@ -98,6 +99,7 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 | :---: | :---: | --- |
 | stopID | HO06-S-1250-0 | <BR>Which stop would you like to have displayed? <BR><EM> Default: HO06-S-1250-0</EM><P> |
 | showLabelRow<BR>`optional` | true | <BR> Show or hide column headers<BR> <EM>Possible values: true, false</EM><P> |
+| hideInactiveRoute<BR>`optional` | true | <BR> Show or hide inactive routes<BR> <EM>Possible values: true, false</EM><P> |
 | reloadInterval<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
 
 ## Acknowledgement

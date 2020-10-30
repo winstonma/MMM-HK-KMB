@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
 
     const stopID = stopConfig.stopID;
 
-    if (typeof this.stopFetchers[stopID] === "undefined") {
+    if (this.stopFetchers[stopID] === undefined) {
       Log.log(`Create new stop fetcher for stopID: ${stopID}`);
       fetcher = new BusStopFetcher(stopID);
       fetcher.onReceive((fetcher) => {
