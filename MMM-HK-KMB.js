@@ -202,11 +202,6 @@ Module.register("MMM-HK-KMB", {
         });
       }
 
-      if (this.config.inactiveRouteCountPerRow != 0 && nonActiveRoute > 0) {
-        table.appendChild(this.createSpacerRow());
-        table.appendChild(this.createNonActiveRouteRow(nonActiveRoute));
-      }
-
       wrapper.appendChild(table);
     });
 
