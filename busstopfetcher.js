@@ -8,6 +8,7 @@
 const Log = require("../../js/logger.js");
 const cron = require('node-cron');
 const Kmb = require('js-kmb-api').default;
+const hkscsConverter = require('hkscs_unicode_converter');
 
 /**
  * Responsible for requesting an update and broadcasting the data.
@@ -48,7 +49,10 @@ const BusStopFetcher = function (stopID) {
   const fetchBusStop = async function () {
     await stop.getStoppings()
       .then(data => {
-        item = data;
+        item = data.map(element => {
+          element.variant.destination = hkscsConverter.convertString(element.variant.destination);
+          return element;
+        });
         self.broadcastItems();
       })
       .catch(error => {
@@ -94,7 +98,7 @@ const BusStopFetcher = function (stopID) {
   };
 
   this.stopName = function () {
-    return stop.name;
+    return hkscsConverter.convertString(stop.name);
   }
 };
 
