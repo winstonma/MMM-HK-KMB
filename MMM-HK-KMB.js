@@ -208,7 +208,7 @@ Module.register("MMM-HK-KMB", {
         // Show routes without active ETA
         if (!hideInactiveRoute) {
           const inactiveRouteNumberList = Object.values(stopInfo.stopInfo)
-            .map(routeInfo => (routeInfo.etas !== undefined) ? routeInfo : null)
+            .map(routeInfo => (routeInfo.etas == undefined) ? routeInfo : null)
             .filter(routeInfo => routeInfo !== null)
             .map(routeInfo => routeInfo.variant.route.number);
 
