@@ -1,6 +1,6 @@
 {
   "name": "MMM-HK-KMB",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "MagicMirror² module - station monitor for Hong Kong KMB",
   "repository": {
     "type": "git",
