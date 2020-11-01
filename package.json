@@ -23,7 +23,6 @@
   "dependencies": {
     "hkscs_unicode_converter": "^0.1.3",
     "js-kmb-api": "^3.0.0",
-    "node-cron": "^2.0.3",
-    "notosans-fontface": "^1.2.2"
+    "node-cron": "^2.0.3"
   }
 }
