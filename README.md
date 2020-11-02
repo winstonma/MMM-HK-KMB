@@ -104,5 +104,5 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
 | reloadInterval<BR>`optional`  | 60000 | <BR> How often should the information be updated? (In milliseconds) <BR><EM> Default: Every minute </EM><P> |
 
 ## Acknowledgement
-This project is possible only when given the code [kmb-lwb-combined-headway-eta](https://github.com/miklcct/kmb-lwb-combined-headway-eta), which is developed by miklcct.
+This project is possible only when given the code [js-kmb-api](https://github.com/miklcct/js-kmb-api), which is developed by miklcct.
 Last but not least, I would like to dedicate my thanks to AlvinHKH, who implement working Android implementation [BusETA](https://github.com/alvinhkh/buseta).
