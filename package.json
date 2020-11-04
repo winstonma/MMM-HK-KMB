@@ -1,6 +1,6 @@
 {
   "name": "MMM-HK-KMB",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "MagicMirror² module - station monitor for Hong Kong KMB",
   "repository": {
     "type": "git",
@@ -21,8 +21,7 @@
   },
   "homepage": "https://github.com/winstonma/MMM-HK-KMB#readme",
   "dependencies": {
-    "hkscs_unicode_converter": "^0.1.3",
-    "js-kmb-api": "^3.0.0",
+    "js-kmb-api": "^3.2.1",
     "node-cron": "^2.0.3"
   }
 }

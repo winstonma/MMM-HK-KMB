@@ -1,6 +1,10 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.5.2] - 2020-11-04
+* US Election Day release
+* Removed [hkscs_unicode_converter](https://github.com/chaklim/hkscs_unicode_converter) as Hong Kong character is handled in [js-kmb-api](https://github.com/miklcct/js-kmb-api)
+
 ## [1.5.1] - 2020-11-01
 * Use [hkscs_unicode_converter](https://github.com/chaklim/hkscs_unicode_converter) to fix the Hong Kong character problem
 * Fix the hideInactiveRoute logic

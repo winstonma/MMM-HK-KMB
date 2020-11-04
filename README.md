@@ -20,7 +20,7 @@ Here are the screenshots with different language settings:
 
 ## Current version
 
-v1.5.1
+v1.5.2
 
 ## Languages
 As of version 1.4.2, MMM-HK-KMB features language support for `Traditional Chinese (zh-tw and zh-hk)`,  `Simplified Chinese (zh-cn)` and `English (en)`.
@@ -32,7 +32,6 @@ A working installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/
   * npm
   * [node-schedule](https://www.npmjs.com/package/node-schedule)
   * [js-kmb-api](https://github.com/miklcct/js-kmb-api)
-  * [hkscs_unicode_converter](https://github.com/chaklim/hkscs_unicode_converter)
 
 ## Installation
 To add this module, go to MagicMirror folder and run the following command
