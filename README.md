@@ -88,7 +88,7 @@ Sample configuration entry for your `~/MagicMirror/config/config.js` with option
     ...
 
 ## Find the `stopID`
-1. Open your web browser and navigate to the [kmb-lwb-combined-headway-eta](http://kmb_eta.csproject.org/) page, developed by miklcct.
+1. Open your web browser and navigate to the [kmb_eta](https://miklcct.com/kmb_eta/) page, developed by miklcct.
 2. In the `Enter the route number:` box, enter the KMB Bus route number that passes the stop. Then press the submit button. The destination and the home would be displayed.
 3. After the submit of the bus route, the route origin and destination would be displayed. Choose the right direction by clicking the `Switch direction` button.
 4. In the `Choose a route variant:` infobox, select the variant.
