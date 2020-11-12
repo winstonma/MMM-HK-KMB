@@ -107,8 +107,8 @@ Module.register("MMM-HK-KMB", {
   generateStopInfo: function (stop) {
     if (this.subscribedToBusStop(stop.stopID)) {
       // Sort the stopInfo
-      stop.stopInfo = Object.entries(stop.stopInfo)
-        .sort(([, a], [, b]) => {
+      stop.stopInfo = stop.stopInfo
+        .sort((a, b) => {
           if (a.stop.id != b.stop.id)
             return (a.stop.id > b.stop.id) ? 1 : -1;
 
@@ -123,11 +123,8 @@ Module.register("MMM-HK-KMB", {
             else
               return (a.stop.sequence > b.stop.sequence) ? 1 : -1;
           }
-        })
-        .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+        });
 
-      // Add the stopName
-      stop.stopName = stop.stopName;
       this.stopInfo[stop.stopID] = stop;
 
       this.updateDom();
