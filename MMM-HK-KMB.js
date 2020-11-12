@@ -115,14 +115,7 @@ Module.register("MMM-HK-KMB", {
           if (a.variant.route.number != b.variant.route.number)
             return (a.variant.route.number < b.variant.route.number) ? -1 : 1;
 
-          if (a.stop.sequence != b.stop.sequence) {
-            if (a.stop.sequence === "999")
-              return -1;
-            else if (b.stop.sequence === "999")
-              return 1;
-            else
-              return (a.stop.sequence > b.stop.sequence) ? 1 : -1;
-          }
+          return a.sequence - b.sequence;
         });
 
       this.stopInfo[stop.stopID] = stop;
