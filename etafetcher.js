@@ -34,12 +34,12 @@ const ETAFetcher = function (stop, reloadInterval) {
   /**
    * Request the ETA
    */
-  const fetchETA = async function () {
+  const fetchETA = function () {
     clearTimeout(reloadTimer);
     reloadTimer = null;
     item = [];
 
-    await stop.getEtas()
+    stop.getEtas()
       .then(data => {
         item = data;
         self.broadcastItems();
