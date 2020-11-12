@@ -27,7 +27,7 @@ const BusStopFetcher = function (stopID) {
   }
   const lang = langTable[config.language] || 'en';
   const kmb = new Kmb(lang);
-  let stopName = '';
+  const stop = stopID ? new kmb.Stop(stopID, undefined) : null;
 
   // Create a schduler to update the bustop info (every 5am)
   cron.schedule('* 5 * * *', () => {
@@ -46,17 +46,10 @@ const BusStopFetcher = function (stopID) {
    * Request the stop info
    */
   const fetchBusStop = function () {
-    const stopWithoutName = stopID ? new kmb.Stop(stopID, null) : null;
-    stopWithoutName.getStoppings()
-      .then(data => data[0].stop.name)
-      .then(actualStopName => {
-        stopName = actualStopName;
-        const stop = new kmb.Stop(stopID, stopName);
-        stop.getStoppings()
-          .then(data => {
-            item = data;
-            self.broadcastItems();
-          })
+    stop.getStoppings()
+      .then(data => {
+        item = data;
+        self.broadcastItems();
       })
       .catch(error => {
         Log.error(error);
@@ -102,7 +95,7 @@ const BusStopFetcher = function (stopID) {
   };
 
   this.stopName = function () {
-    return stopName;
+    return stop.name;
   }
 };
 
