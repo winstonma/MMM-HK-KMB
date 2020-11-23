@@ -27,7 +27,7 @@ const BusStopFetcher = function (stopID) {
   }
   const lang = langTable[config.language] || 'en';
   const kmb = new Kmb(lang);
-  const stop = stopID ? new kmb.Stop(stopID, undefined) : null;
+  const stop = stopID ? new kmb.Stop(stopID) : null;
 
   // Create a schduler to update the bustop info (every 5am)
   cron.schedule('* 5 * * *', () => {
