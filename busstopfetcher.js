@@ -25,8 +25,9 @@ const BusStopFetcher = function (stopID) {
     'zh-hk': 'zh-hant',
     'zh-cn': 'zh-hans'
   }
+  let localStorage;
   const lang = langTable[config.language] || 'en';
-  const kmb = new Kmb(lang);
+  const kmb = new Kmb(lang, localStorage);
   const stop = stopID ? new kmb.Stop(stopID) : null;
 
   // Create a schduler to update the bustop info (every 5am)
