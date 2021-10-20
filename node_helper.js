@@ -34,7 +34,7 @@ module.exports = NodeHelper.create({
   getStopInfo: function (stopConfig, config) {
     let fetcher;
 
-    const stopID = stopConfig.stopID;
+    const stopID = stopConfig;
 
     if (this.stopFetchers[stopID] === undefined) {
       Log.log(`Create new stop fetcher for stopID: ${stopID}`);
@@ -86,7 +86,7 @@ module.exports = NodeHelper.create({
    * @param {config} the config parameter (an object)
    */
   createETAFetcher: function (stopConfig, stop, config) {
-    const stopID = stopConfig.stopID;
+    const stopID = stopConfig;
     const reloadInterval = stopConfig.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
     let fetcher = new ETAFetcher(stop, reloadInterval);
 

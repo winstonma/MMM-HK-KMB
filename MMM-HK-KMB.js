@@ -24,11 +24,7 @@ const BUSLINELOOKUP = {
 Module.register("MMM-HK-KMB", {
   // Default module config.
   defaults: {
-    stops: [
-      {
-        stopID: 'HO06-S-1250-0',
-      }
-    ],
+    stopID: 'HO06-S-1250-0',
     timeFormat: (config.timeFormat !== 24) ? "h:mm" : "HH:mm",
     hideInactiveRoute: true,        // hide inactive route
     showLabelRow: true,
@@ -58,7 +54,7 @@ Module.register("MMM-HK-KMB", {
     Log.info("Starting module: " + this.name);
 
     // Collect the stop info (including the routes that the stop)
-    this.stopInfo = {};
+    this.stopInfo = [];
 
     this.registerStops();
   },
@@ -67,11 +63,9 @@ Module.register("MMM-HK-KMB", {
    * registers the stops to be used by the backend.
    */
   registerStops: function () {
-    Object.values(this.config.stops).forEach((stop) => {
-      this.sendSocketNotification("ADD_STOP", {
-        stop: stop,
-        config: this.config
-      });
+    this.sendSocketNotification("ADD_STOP", {
+      stop: this.config.stopID,
+      config: this.config
     });
   },
 
@@ -81,22 +75,14 @@ Module.register("MMM-HK-KMB", {
    * @param {object} etas An object with ETAs returned by the node helper.
    */
   generateETAInfo: function (eta) {
-    let dataUpdated = false;
-
-    Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
-      if (eta[stopID]) {
-        dataUpdated = true;
-        Object.values(stopInfo.stopInfo).forEach(routeInfo => {
-          routeInfo.etas = eta[stopID].find(([x,]) =>
-            ((JSON.stringify(x.stopping.stop) === JSON.stringify(routeInfo.stop)) &&
-              (JSON.stringify(x.stopping.variant) === JSON.stringify(routeInfo.variant)))
-          );
-        });
-      }
+    this.stopInfo.stopInfo.forEach(stopInfo => {
+      stopInfo.etas = eta[this.config.stopID].find(([x,]) =>
+      ((JSON.stringify(x.stopping.stop) === JSON.stringify(stopInfo.stop)) &&
+        (JSON.stringify(x.stopping.variant) === JSON.stringify(stopInfo.variant)))
+      );
     });
 
-    if (dataUpdated)
-      this.updateDom();
+    this.updateDom();
   },
 
   /**
@@ -118,7 +104,7 @@ Module.register("MMM-HK-KMB", {
           return a.sequence - b.sequence;
         });
 
-      this.stopInfo[stop.stopID] = stop;
+      this.stopInfo = stop;
 
       this.updateDom();
     }
@@ -131,12 +117,14 @@ Module.register("MMM-HK-KMB", {
    * @returns {boolean} True if it is subscribed, false otherwise
    */
   subscribedToBusStop: function (stopID) {
-    return this.config.stops.some(element => element.stopID === stopID);
+    return this.config.stopID == stopID;
   },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "ETA_ITEMS") {
-      this.generateETAInfo(payload);
+      if (payload[this.config.stopID]) {
+        this.generateETAInfo(payload);
+      }
     } else if (notification === "STOP_ITEM") {
       this.generateStopInfo(payload);
     } else if (notification === "FETCH_ERROR") {
@@ -151,68 +139,62 @@ Module.register("MMM-HK-KMB", {
   getDom: function () {
     let wrapper = document.createElement("div");
 
-    if (Object.keys(this.stopInfo).length === 0) {
+    if (this.stopInfo.length === 0) {
       wrapper.innerHTML = this.translate("LOADING");
       wrapper.className = this.config.tableClass + " dimmed";
       return wrapper;
     }
 
-    Object.entries(this.stopInfo).forEach(([stopID, stopInfo]) => {
-      this.data.header = stopInfo.stopName;
+    // Start creating connections table
+    let table = document.createElement("table");
+    table.classList.add("small", "table");
+    table.border = '0';
 
-      // Start creating connections table
-      let table = document.createElement("table");
-      table.classList.add("small", "table");
-      table.border = '0';
+    if (this.config.showLabelRow) {
+      table.appendChild(this.createLabelRow());
+    }
 
-      const stopConfig = this.config.stops.find(stop => stop.stopID == stopID);
-      const showLabelRow = (stopConfig.showLabelRow !== undefined) ? stopConfig.showLabelRow : this.config.showLabelRow;
+    table.appendChild(this.createSpacerRow());
 
-      if (showLabelRow) {
-        table.appendChild(this.createLabelRow());
-      }
+    if (Object.keys(this.stopInfo).length == 0) {
+      let row = document.createElement("tr");
 
-      table.appendChild(this.createSpacerRow());
+      let line = document.createElement("td");
+      line.setAttribute("colSpan", "3");
+      line.innerHTML = this.translate("LOADING");
+      row.appendChild(line);
 
-      if (Object.keys(stopInfo.stopInfo).length == 0) {
-        let row = document.createElement("tr");
+      table.appendChild(row);
+    } else {
+      this.stopInfo.stopInfo.forEach(routeInfo => {
+        if (routeInfo.etas) {
+          const data = this.createDataRow(routeInfo);
+          table.appendChild(data);
+        }
+      });
 
-        let line = document.createElement("td");
-        line.setAttribute("colSpan", "3");
-        line.innerHTML = this.translate("LOADING");
-        row.appendChild(line);
+      // Show routes without active ETA
+      if (!this.config.hideInactiveRoute) {
+        const inactiveRouteNumberList = Object.values(stopInfo.stopInfo)
+          .map(routeInfo => (routeInfo.etas == undefined) ? routeInfo : null)
+          .filter(routeInfo => routeInfo !== null)
+          .map(routeInfo => routeInfo.variant.route.number);
 
-        table.appendChild(row);
-      } else {
-        Object.values(stopInfo.stopInfo).forEach(routeInfo => {
-          if (routeInfo.etas) {
-            const data = this.createDataRow(routeInfo);
-            table.appendChild(data);
-          }
-        });
-
-        const hideInactiveRoute = (stopConfig.hideInactiveRoute !== undefined) ? stopConfig.hideInactiveRoute : this.config.hideInactiveRoute;
-
-        let printVar = false;
-
-        // Show routes without active ETA
-        if (!hideInactiveRoute) {
-          const inactiveRouteNumberList = Object.values(stopInfo.stopInfo)
-            .map(routeInfo => (routeInfo.etas == undefined) ? routeInfo : null)
-            .filter(routeInfo => routeInfo !== null)
-            .map(routeInfo => routeInfo.variant.route.number);
-
-          if (inactiveRouteNumberList.length > 0) {
-            const data = this.createNonActiveRouteRow(inactiveRouteNumberList);
-            table.appendChild(data);
-          }
+        if (inactiveRouteNumberList.length > 0) {
+          const data = this.createNonActiveRouteRow(inactiveRouteNumberList);
+          table.appendChild(data);
         }
       }
+    }
 
-      wrapper.appendChild(table);
-    });
+    wrapper.appendChild(table);
 
     return wrapper;
+  },
+
+  // Override getHeader method.
+  getHeader: function () {
+    return ('stopInfo' in this.stopInfo) ? this.stopInfo.stopName : this.name;
   },
 
   createLabelRow: function () {
