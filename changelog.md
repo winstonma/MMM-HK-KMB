@@ -1,6 +1,10 @@
 # MMM-HK-KMB changelog
 This module adheres to Winston
 
+## [1.6.0] - 2021-10-20
+* Revert the multiple stops support (This module makes more sense if it only support one stop).  Please remove the update the ```stops``` array settings inside ```config.js```. For more information please read the ```Configuration``` section inside [README.md](https://github.com/winstonma/MMM-HK-KMB/blob/master/README.md)
+* 
+
 ## [1.5.2] - 2020-11-04
 * US Election Day release
 * Removed [hkscs_unicode_converter](https://github.com/chaklim/hkscs_unicode_converter) as Hong Kong character is handled in [js-kmb-api](https://github.com/miklcct/js-kmb-api)
