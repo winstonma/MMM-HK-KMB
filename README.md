@@ -1,4 +1,6 @@
 # MMM-HK-KMB
+NOTE: I deprecated this module. Please feel free to take a look at [MMM-HK-Transport-ETA](https://github.com/winstonma/MMM-HK-Transport-ETA).
+
 **Station monitor** for the **Hong Kong KMB**.
 
 This module is an extension of the amazing [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror) project by [MichMich](https://github.com/MichMich/) which has inspired me to share my coding skills with others as well. Check it out, you know you want to :).
